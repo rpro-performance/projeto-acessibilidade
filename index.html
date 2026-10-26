@@ -6,53 +6,170 @@
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Treine me</title>
+    <meta name="description" content="Veículo Mais: busque um carro uma vez e veja os anúncios de todos os sites do mercado em um só lugar." />
+    <title>Veículo Mais</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
-
   </head>
   <body>
+    <a class="skip-link" href="#busca">Pular para a busca</a>
+
     <div class="page">
-        <div class="nav">
-          <a id="logo" href="#">
-            <img src="images/logo.svg" alt="Treine.me" />
-          </a>
-          <div class="list">
-            <div class="item"><a href="#">Home</a></div>
-            <div class="item"><a href="#">Sobre</a></div>
-            <div class="item"><a href="#">Treinar</a></div>
+      <header class="nav">
+        <a id="logo" href="#">
+          <img src="images/logo.svg" alt="Veículo Mais" />
+        </a>
+        <nav aria-label="Principal">
+          <ul class="list">
+            <li class="item"><a href="#">Home</a></li>
+            <li class="item"><a href="#como-funciona">Como funciona</a></li>
+            <li class="item"><a href="#busca">Buscar</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div>
+            <h1 class="title">Todos os carros da internet <span>em um só lugar</span></h1>
+
+            <p class="subtitle">
+              Pare de pesquisar site por site. Diga qual carro você procura e o
+              <strong>Veículo Mais busca na OLX, Webmotors, iCarros, Mobiauto e em dezenas de outros sites</strong>
+              ao mesmo tempo, mostrando foto, ano, preço, descrição e os problemas conhecidos de cada modelo.
+            </p>
+
+            <a class="button" href="#busca">Buscar meu carro</a>
           </div>
-        </div class="nav">
-    
-      <div class="main">
-        <div>
-          <div class="title">Treinos <span>exclusivos</span> para você!</div>
 
-          <div class="subtitle">
-            Nós criamos treinos <strong>exclusivos e únicos para você.</strong></br>
-            Invista no seu corpo e <strong>tenha muito mais performance</strong> e 
-            <br>
-            qualidade de vida.
-          </div>
+          <img src="images/car.svg" alt="Ilustração de um carro visto de lado." />
+        </section>
 
-          <button>
-            <img src="images/whats.svg" alt="Ícone do whatsapp">
-            Comece já
-          </button>
-          
+        <section id="busca" class="search" aria-labelledby="busca-titulo">
+          <h2 id="busca-titulo">Buscar veículo</h2>
 
-        </div>
+          <form class="search-form" action="#resultados" method="get">
+            <div class="field">
+              <label for="marca">Marca</label>
+              <input id="marca" name="marca" type="text" list="marcas" placeholder="Ex.: Volkswagen" autocomplete="off" />
+              <datalist id="marcas">
+                <option value="Chevrolet"></option>
+                <option value="Fiat"></option>
+                <option value="Ford"></option>
+                <option value="Honda"></option>
+                <option value="Hyundai"></option>
+                <option value="Jeep"></option>
+                <option value="Renault"></option>
+                <option value="Toyota"></option>
+                <option value="Volkswagen"></option>
+              </datalist>
+            </div>
 
-        <img src="images/img.png" alt="Desenho de uma mulher pulando corta numa academia.">
-      </div>
-      <div class="footer">
-          fale conosco no instagram <a href="https://instagram.com/treineme" target="_blank">@treine.me</a>
-      </div>
+            <div class="field">
+              <label for="modelo">Modelo</label>
+              <input id="modelo" name="modelo" type="text" placeholder="Ex.: Jetta GLI" />
+            </div>
+
+            <div class="field">
+              <label for="ano-de">Ano de</label>
+              <input id="ano-de" name="anoDe" type="number" min="1950" max="2027" placeholder="2018" />
+            </div>
+
+            <div class="field">
+              <label for="ano-ate">Ano até</label>
+              <input id="ano-ate" name="anoAte" type="number" min="1950" max="2027" placeholder="2024" />
+            </div>
+
+            <div class="field">
+              <label for="preco-de">Preço de (R$)</label>
+              <input id="preco-de" name="precoDe" type="number" min="0" step="1000" placeholder="80.000" />
+            </div>
+
+            <div class="field">
+              <label for="preco-ate">Preço até (R$)</label>
+              <input id="preco-ate" name="precoAte" type="number" min="0" step="1000" placeholder="200.000" />
+            </div>
+
+            <div class="field">
+              <label for="cambio">Câmbio</label>
+              <select id="cambio" name="cambio">
+                <option value="">Qualquer</option>
+                <option value="automatico">Automático</option>
+                <option value="manual">Manual</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="combustivel">Combustível</label>
+              <select id="combustivel" name="combustivel">
+                <option value="">Qualquer</option>
+                <option value="flex">Flex</option>
+                <option value="gasolina">Gasolina</option>
+                <option value="diesel">Diesel</option>
+                <option value="hibrido">Híbrido</option>
+                <option value="eletrico">Elétrico</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="local">Cidade ou estado</label>
+              <input id="local" name="local" type="text" placeholder="Ex.: Belo Horizonte, MG" />
+            </div>
+
+            <fieldset class="field field-wide">
+              <legend>Buscar em</legend>
+              <div class="sources">
+                <label><input type="checkbox" name="fonte" value="olx" checked /> OLX</label>
+                <label><input type="checkbox" name="fonte" value="webmotors" checked /> Webmotors</label>
+                <label><input type="checkbox" name="fonte" value="icarros" checked /> iCarros</label>
+                <label><input type="checkbox" name="fonte" value="mobiauto" checked /> Mobiauto</label>
+                <label><input type="checkbox" name="fonte" value="mercadolivre" checked /> Mercado Livre</label>
+                <label><input type="checkbox" name="fonte" value="facebook" checked /> Facebook Marketplace</label>
+                <label><input type="checkbox" name="fonte" value="chavesnamao" checked /> Chaves na Mão</label>
+                <label><input type="checkbox" name="fonte" value="concessionarias" checked /> Concessionárias e lojas</label>
+              </div>
+            </fieldset>
+
+            <div class="field field-wide actions">
+              <button type="submit" class="button">Buscar em todos os sites</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="resultados" class="results" aria-labelledby="resultados-titulo" aria-live="polite">
+          <h2 id="resultados-titulo">Resultados</h2>
+          <p class="empty">Faça uma busca acima para ver os anúncios encontrados em todos os sites.</p>
+
+          <!-- Exemplo do card de anúncio que a busca vai gerar -->
+          <article class="card" aria-label="Exemplo de anúncio">
+            <img src="images/car.svg" alt="Foto do veículo anunciado." />
+            <div class="card-body">
+              <h3>Volkswagen Jetta GLI 2.0 TSI</h3>
+              <p class="meta">2022 · 28.000 km · Automático · Flex · Belo Horizonte, MG</p>
+              <p class="price">R$ 189.900</p>
+              <p class="desc">Único dono, revisões em concessionária, teto solar, pacote tecnológico.</p>
+              <p class="issues"><strong>Problemas conhecidos do modelo:</strong> consumo de óleo em motores TSI de alta quilometragem; verificar histórico de revisões.</p>
+              <p class="source">Encontrado em: <a href="#">Webmotors</a>, <a href="#">OLX</a></p>
+            </div>
+          </article>
+        </section>
+
+        <section id="como-funciona" class="how" aria-labelledby="como-titulo">
+          <h2 id="como-titulo">Como funciona</h2>
+          <ol>
+            <li><strong>Você filtra uma vez:</strong> marca, modelo, ano, preço, câmbio, combustível e cidade.</li>
+            <li><strong>Nós buscamos em todos os sites</strong> de anúncios ao mesmo tempo.</li>
+            <li><strong>Os anúncios repetidos são agrupados</strong> e você vê cada carro uma vez só, com os links de todas as fontes.</li>
+            <li><strong>Cada anúncio traz</strong> foto, ano, km, preço, descrição e os problemas conhecidos daquele modelo.</li>
+          </ol>
+        </section>
+      </main>
+
+      <footer class="footer">
+        Veículo Mais · todos os carros da internet em um só lugar
+      </footer>
     </div>
-
-    <img id="balls" src="images/balls.svg" alt="Bolinhas decorativas verdes no canto inferior direito da página.">
-
   </body>
 </html>
