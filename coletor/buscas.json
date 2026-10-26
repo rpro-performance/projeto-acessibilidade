@@ -1,0 +1,11 @@
+{
+  "_ajuda": "Edite esta lista. Cada busca roda em todas as fontes. Campos opcionais: anoDe, anoAte, precoDe, precoAte, kmAte, cambio, combustivel, local.",
+  "buscas": [
+    { "nome": "Jetta GLI", "marca": "Volkswagen", "modelo": "Jetta GLI", "anoDe": 2019, "precoAte": 200000 },
+    { "nome": "Civic", "marca": "Honda", "modelo": "Civic", "anoDe": 2020, "precoAte": 160000 },
+    { "nome": "Corolla", "marca": "Toyota", "modelo": "Corolla", "anoDe": 2020, "precoAte": 160000 }
+  ],
+  "fontes": ["mobiauto", "napista", "chavesnamao", "olx", "webmotors"],
+  "paginasPorFonte": 2,
+  "ritmoMs": { "min": 2500, "max": 6000 }
+}

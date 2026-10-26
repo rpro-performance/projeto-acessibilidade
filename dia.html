@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Veículo Mais: os veículos de hoje, quedas de preço e oportunidades abaixo da FIPE, coletados automaticamente todo dia." />
+    <title>Veículo Mais · Hoje</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#hoje">Pular para os veículos de hoje</a>
+    <div class="page">
+      <header class="nav">
+        <a id="logo" href="index.html"><img src="images/logo.svg" alt="Veículo Mais" /></a>
+        <nav aria-label="Principal">
+          <ul class="list">
+            <li class="item"><a href="index.html">Home</a></li>
+            <li class="item"><a href="index.html#busca">Buscar</a></li>
+            <li class="item"><a href="dia.html" aria-current="page">Hoje</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <main id="hoje">
+        <h1 class="title titulo-pagina">Veículos de <span>hoje</span></h1>
+        <p class="subtitle">O coletor roda todo dia no seu computador, lê os sites como você faria e guarda tudo aqui: o que apareceu, o que caiu de preço, o que está abaixo da FIPE e o que já foi vendido.</p>
+
+        <section id="painel" aria-live="polite">
+          <p class="empty">Carregando…</p>
+        </section>
+
+        <section class="results" aria-labelledby="lista-titulo">
+          <div class="results-head">
+            <h2 id="lista-titulo">Anúncios</h2>
+            <div class="filtros-dia">
+              <label class="ordem">Mostrar
+                <select id="tipo">
+                  <option value="novos">Novos hoje</option>
+                  <option value="quedas">Caíram de preço</option>
+                  <option value="abaixo-fipe">Abaixo da FIPE</option>
+                  <option value="sumiram">Sumiram hoje (vendidos?)</option>
+                  <option value="todos">Todos os ativos</option>
+                </select>
+              </label>
+              <label class="ordem">Busca
+                <select id="busca"><option value="">Todas</option></select>
+              </label>
+            </div>
+          </div>
+          <div id="lista-dia"></div>
+        </section>
+      </main>
+
+      <footer class="footer">Veículo Mais · todos os carros da internet em um só lugar</footer>
+    </div>
+    <script src="cards.js"></script>
+    <script src="dia.js"></script>
+  </body>
+</html>

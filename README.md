@@ -81,33 +81,100 @@ Já funciona de ponta a ponta: a página chama a API, que consulta as fontes em 
 | Chaves na Mão | funcionando | payload React Server Components, 2 páginas (30 anúncios) |
 | Tabela FIPE | funcionando | API pública (parallelum.com.br), com cache de 12 h |
 | Mercado Livre | precisa de token | API oficial; crie um app em developers.mercadolivre.com.br e rode com `MERCADOLIVRE_TOKEN=... npm start` |
-| OLX | bloqueado | proteção anti-robô (Cloudflare) recusa a busca automática |
-| Webmotors | bloqueado | proteção anti-robô (PerimeterX) recusa a busca automática |
+| OLX | só pelo coletor no seu computador | bloqueia servidores (Cloudflare); o coletor diário lê pelo seu Chrome |
+| Webmotors | só pelo coletor no seu computador | bloqueia servidores (PerimeterX); o coletor diário lê pelo seu Chrome |
 | iCarros, Seminovos.com.br | bloqueado / sem listagem acessível | |
 
 Os conectores leem o HTML público dos sites, então uma mudança de layout pode quebrá-los. Cada um fica isolado em `src/connectors/` e, quando falha, a busca continua com as outras fontes e o status aparece na página.
 
 A ficha de problemas conhecidos (`data/problemas-conhecidos.json`) é curada à mão, com relatos comuns de proprietários para os modelos mais vendidos. Não substitui laudo cautelar.
 
+## Coletor diário (roda no seu Mac)
+
+OLX e Webmotors bloqueiam servidores, mas não bloqueiam uma pessoa no Chrome. O coletor roda no seu computador, abre o seu Chrome (num perfil próprio do Veículo Mais), visita os sites em ritmo humano, lê os anúncios das buscas que você definiu e guarda tudo num banco local. Todo dia ele compara com o dia anterior e monta a avaliação: novos, quedas de preço, abaixo da FIPE, sumidos (provavelmente vendidos) e as melhores oportunidades. A página **Hoje** (`dia.html`) mostra isso.
+
+### Instalação no Mac
+
+1. Instale o Node 22 ou mais novo: `brew install node` ou pelo instalador em https://nodejs.org.
+2. Na pasta do projeto, instale as dependências do coletor (Playwright e SDK da Anthropic):
+   ```bash
+   npm install
+   ```
+3. Edite `coletor/buscas.json` com os carros que você quer acompanhar (marca, modelo, ano, preço, região).
+4. Rode a primeira coleta com a janela do Chrome visível, para ver tudo acontecendo:
+   ```bash
+   npm run coletar
+   ```
+   O banco fica em `~/.veiculomais/veiculomais.db`. Se um site mostrar captcha, resolva na janela; o perfil guarda a sessão para as próximas vezes.
+5. Agende para rodar todo dia (padrão 6h; o Mac precisa estar ligado e com você logado):
+   ```bash
+   npm run agendar:mac            # ou: bash coletor/instalar-mac.sh 7 30  (7h30)
+   ```
+6. Suba o site e abra a página Hoje:
+   ```bash
+   npm start
+   # http://localhost:3000/dia.html
+   ```
+
+### Resumo do dia por IA
+
+Com uma chave da Anthropic no ambiente, o Claude escreve a avaliação do dia (visão geral, oportunidades com o que checar, o que sumiu). Sem chave, sai um resumo automático simples.
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+npm run coletar
+```
+
+Para o agendamento usar a chave, exporte a variável antes de rodar `npm run agendar:mac` (o script grava a chave no agendamento).
+
+### Comandos úteis
+
+| Comando | O que faz |
+| --- | --- |
+| `npm run coletar` | roda todas as buscas, Chrome visível |
+| `npm run coletar:invisivel` | mesmo, sem janela |
+| `npm run coletar:rapido` | só Mobiauto, Na Pista e Chaves na Mão (sem navegador, uns 10 s) |
+| `node coletor/index.js --busca "Jetta GLI" --fontes olx,webmotors` | uma busca, fontes escolhidas |
+| `npm run desagendar:mac` | remove o agendamento |
+
+### Se OLX ou Webmotors falharem
+
+Os conectores desses dois sites foram escritos sem acesso direto a eles (bloqueiam servidores), então a primeira rodada pode precisar de ajuste. Quando nada é reconhecido, o coletor salva o HTML e uma captura de tela em `~/.veiculomais/debug/`. Mande esses arquivos (ou a mensagem de erro do log em `~/.veiculomais/coletor.log`) e o conector é corrigido. As outras fontes continuam funcionando enquanto isso.
+
+### Limites
+
+- Uma página de listagem leva uns 5 segundos em ritmo humano. Vinte buscas em cinco sites, duas páginas cada, levam por volta de 15 minutos.
+- Não aumente muito `paginasPorFonte` nem a lista de buscas: volume alto dispara o bloqueio mesmo no Chrome.
+- Os termos de uso desses sites restringem coleta automática. Este coletor é para uso pessoal.
+
 ## Estrutura
 
 ```
-server.js                  servidor HTTP: página estática + /api
+server.js                  servidor HTTP: páginas estáticas + /api (busca ao vivo e /api/dia)
 src/search.js              orquestra fontes, filtros, dedup, FIPE e problemas
 src/connectors/*.js        um conector por site (chave, nome, buscar(filtros))
 src/normalize.js           formato padrão de anúncio
 src/dedup.js               agrupamento de anúncios repetidos
 src/fipe.js                consulta FIPE com cache
 src/problemas.js           ficha de problemas conhecidos
+src/db.js                  banco SQLite local (anúncios, histórico de preço, coletas)
+coletor/index.js           coletor diário
+coletor/buscas.json        lista de buscas acompanhadas
+coletor/fontes/*.js        OLX e Webmotors via navegador
+coletor/avaliar.js         avaliação do dia e oportunidades
+coletor/resumo.js          resumo por IA (SDK da Anthropic) ou automático
+coletor/instalar-mac.sh    agendamento diário (launchd)
 data/problemas-conhecidos.json
-index.html, style.css, app.js   página do usuário
+index.html, app.js         busca ao vivo
+dia.html, dia.js           veículos de hoje
+cards.js, style.css        renderização e estilo compartilhados
 test/                      testes unitários (node --test)
 ```
 
 ## Próximos passos
 
-1. Mais fontes: lojas e concessionárias com página pública simples, Mercado Livre com token.
-2. Paginação e mais páginas por fonte para buscas amplas.
-3. Cache dos resultados por alguns minutos e histórico de preço por anúncio.
-4. Alertas de busca salva e favoritos (exige banco de dados e login).
+1. Ajustar os conectores de OLX e Webmotors com a primeira rodada no Mac.
+2. Alertas (e-mail ou WhatsApp) quando aparecer uma oportunidade.
+3. Gráfico de histórico de preço por anúncio e por modelo.
+4. Mais fontes: lojas e concessionárias, Mercado Livre com token.
 5. Enriquecer a ficha de problemas com recalls oficiais (Denatran/Procon).

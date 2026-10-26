@@ -7,6 +7,7 @@ const path = require("path");
 const { buscar } = require("./src/search");
 const { fontes } = require("./src/connectors");
 const fipe = require("./src/fipe");
+const db = require("./src/db");
 
 const PORT = Number(process.env.PORT || 3000);
 const RAIZ = __dirname;
@@ -52,6 +53,38 @@ async function api(req, res, url) {
   }
   if (url.pathname === "/api/fontes") {
     return json(res, 200, fontes.map((f) => ({ chave: f.chave, nome: f.nome })));
+  }
+  if (url.pathname === "/api/dia" || url.pathname === "/api/dia/anuncios") {
+    let banco = null;
+    try {
+      banco = db.abrir({ somenteLeitura: true });
+    } catch (e) {
+      return json(res, 200, { configurado: false, erro: e.message });
+    }
+    if (!banco) return json(res, 200, { configurado: false });
+    try {
+      const data = url.searchParams.get("data") || db.hoje();
+      if (url.pathname === "/api/dia") {
+        const ultima = db.ultimaColeta(banco);
+        return json(res, 200, {
+          configurado: true,
+          data,
+          contagens: db.contagens(banco, ultima ? ultima.data : data),
+          buscas: db.buscasSalvas(banco),
+          ultimaColeta: ultima,
+        });
+      }
+      const ultima = db.ultimaColeta(banco);
+      const anuncios = db.listar(banco, {
+        tipo: url.searchParams.get("tipo") || "novos",
+        data: ultima ? ultima.data : data,
+        busca: url.searchParams.get("busca") || null,
+        limite: Number(url.searchParams.get("limite") || 200),
+      });
+      return json(res, 200, { anuncios });
+    } finally {
+      banco.close();
+    }
   }
   if (url.pathname === "/api/fipe") {
     const r = await fipe.referencia({
