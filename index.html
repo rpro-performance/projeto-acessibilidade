@@ -37,8 +37,8 @@
 
             <p class="subtitle">
               Pare de pesquisar site por site. Diga qual carro você procura e o
-              <strong>Veículo Mais busca na OLX, Webmotors, iCarros, Mobiauto e em dezenas de outros sites</strong>
-              ao mesmo tempo, mostrando foto, ano, preço, descrição e os problemas conhecidos de cada modelo.
+              <strong>Veículo Mais busca em vários sites de anúncios ao mesmo tempo</strong>,
+              mostrando foto, ano, km, preço, comparação com a FIPE e os problemas conhecidos de cada modelo.
             </p>
 
             <a class="button" href="#busca">Buscar meu carro</a>
@@ -114,6 +114,11 @@
             </div>
 
             <div class="field">
+              <label for="km-ate">Km até</label>
+              <input id="km-ate" name="kmAte" type="number" min="0" step="5000" placeholder="100.000" />
+            </div>
+
+            <div class="field">
               <label for="local">Cidade ou estado</label>
               <input id="local" name="local" type="text" placeholder="Ex.: Belo Horizonte, MG" />
             </div>
@@ -121,15 +126,12 @@
             <fieldset class="field field-wide">
               <legend>Buscar em</legend>
               <div class="sources">
-                <label><input type="checkbox" name="fonte" value="olx" checked /> OLX</label>
-                <label><input type="checkbox" name="fonte" value="webmotors" checked /> Webmotors</label>
-                <label><input type="checkbox" name="fonte" value="icarros" checked /> iCarros</label>
                 <label><input type="checkbox" name="fonte" value="mobiauto" checked /> Mobiauto</label>
-                <label><input type="checkbox" name="fonte" value="mercadolivre" checked /> Mercado Livre</label>
-                <label><input type="checkbox" name="fonte" value="facebook" checked /> Facebook Marketplace</label>
+                <label><input type="checkbox" name="fonte" value="napista" checked /> Na Pista</label>
                 <label><input type="checkbox" name="fonte" value="chavesnamao" checked /> Chaves na Mão</label>
-                <label><input type="checkbox" name="fonte" value="concessionarias" checked /> Concessionárias e lojas</label>
+                <label><input type="checkbox" name="fonte" value="mercadolivre" checked /> Mercado Livre <small>(precisa de token)</small></label>
               </div>
+              <p class="nota">OLX, Webmotors e iCarros bloqueiam buscas automáticas e ainda não estão disponíveis.</p>
             </fieldset>
 
             <div class="field field-wide actions">
@@ -138,31 +140,32 @@
           </form>
         </section>
 
-        <section id="resultados" class="results" aria-labelledby="resultados-titulo" aria-live="polite">
-          <h2 id="resultados-titulo">Resultados</h2>
-          <p class="empty">Faça uma busca acima para ver os anúncios encontrados em todos os sites.</p>
-
-          <!-- Exemplo do card de anúncio que a busca vai gerar -->
-          <article class="card" aria-label="Exemplo de anúncio">
-            <img src="images/car.svg" alt="Foto do veículo anunciado." />
-            <div class="card-body">
-              <h3>Volkswagen Jetta GLI 2.0 TSI</h3>
-              <p class="meta">2022 · 28.000 km · Automático · Flex · Belo Horizonte, MG</p>
-              <p class="price">R$ 189.900</p>
-              <p class="desc">Único dono, revisões em concessionária, teto solar, pacote tecnológico.</p>
-              <p class="issues"><strong>Problemas conhecidos do modelo:</strong> consumo de óleo em motores TSI de alta quilometragem; verificar histórico de revisões.</p>
-              <p class="source">Encontrado em: <a href="#">Webmotors</a>, <a href="#">OLX</a></p>
-            </div>
-          </article>
+        <section id="resultados" class="results" aria-labelledby="resultados-titulo">
+          <div class="results-head">
+            <h2 id="resultados-titulo">Resultados</h2>
+            <label class="ordem">Ordenar por
+              <select id="ordem" name="ordem">
+                <option value="relevancia">Relevância</option>
+                <option value="preco-asc">Menor preço</option>
+                <option value="preco-desc">Maior preço</option>
+                <option value="ano-desc">Mais novo</option>
+                <option value="km-asc">Menor km</option>
+              </select>
+            </label>
+          </div>
+          <p id="status-busca" class="empty" role="status" aria-live="polite">Faça uma busca acima para ver os anúncios encontrados em todos os sites.</p>
+          <div id="resumo-busca" aria-live="polite"></div>
+          <div id="lista-resultados"></div>
         </section>
 
         <section id="como-funciona" class="how" aria-labelledby="como-titulo">
           <h2 id="como-titulo">Como funciona</h2>
           <ol>
             <li><strong>Você filtra uma vez:</strong> marca, modelo, ano, preço, câmbio, combustível e cidade.</li>
-            <li><strong>Nós buscamos em todos os sites</strong> de anúncios ao mesmo tempo.</li>
+            <li><strong>Nós buscamos em vários sites</strong> de anúncios ao mesmo tempo e mostramos quantos anúncios vieram de cada um.</li>
             <li><strong>Os anúncios repetidos são agrupados</strong> e você vê cada carro uma vez só, com os links de todas as fontes.</li>
-            <li><strong>Cada anúncio traz</strong> foto, ano, km, preço, descrição e os problemas conhecidos daquele modelo.</li>
+            <li><strong>Cada anúncio traz</strong> foto, ano, km, preço, quanto está acima ou abaixo da FIPE, descrição e link para o site original.</li>
+            <li><strong>Você ainda vê os problemas conhecidos</strong> daquele modelo para saber o que checar antes de comprar.</li>
           </ol>
         </section>
       </main>
@@ -171,5 +174,7 @@
         Veículo Mais · todos os carros da internet em um só lugar
       </footer>
     </div>
+
+    <script src="app.js"></script>
   </body>
 </html>

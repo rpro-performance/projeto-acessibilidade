@@ -1,0 +1,167 @@
+[
+  {
+    "marca": "Volkswagen",
+    "modelo": "Jetta",
+    "problemas": [
+      { "titulo": "Consumo de óleo em motores TSI", "detalhe": "Motores 2.0 TSI (GLI) e 1.4 TSI podem consumir óleo acima do normal com quilometragem alta. Verifique o nível e o histórico de revisões.", "anoDe": 2011, "anoAte": 2018 },
+      { "titulo": "Câmbio DSG (mecatrônica)", "detalhe": "Trancos ou demora para engatar podem indicar mecatrônica com defeito, reparo caro. Faça test drive em trânsito lento.", "anoDe": 2011, "anoAte": null },
+      { "titulo": "Bomba d'água e corrente de comando", "detalhe": "Relatos de vazamento na bomba d'água e ruído de corrente em TSI de primeira geração.", "anoDe": 2011, "anoAte": 2016 },
+      { "titulo": "Central multimídia e telas", "detalhe": "Falhas intermitentes na central e no painel digital em unidades 2019 em diante; teste todas as funções.", "anoDe": 2019, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Volkswagen",
+    "modelo": "Golf",
+    "problemas": [
+      { "titulo": "Consumo de óleo (1.4 TSI / 2.0 TSI)", "detalhe": "Confira nível de óleo e fumaça azul na partida a frio.", "anoDe": 2013, "anoAte": 2019 },
+      { "titulo": "Câmbio DSG", "detalhe": "Mecatrônica e embreagens duplas são pontos caros. Avalie trancos em baixa velocidade.", "anoDe": 2013, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Volkswagen",
+    "modelo": "Polo",
+    "problemas": [
+      { "titulo": "Motor 1.0 TSI: velas e bobinas", "detalhe": "Falhas de ignição e marcha lenta irregular costumam ser velas/bobinas. Verifique também vazamento de óleo na tampa de válvulas.", "anoDe": 2018, "anoAte": null },
+      { "titulo": "Motor 1.6 MSI: coxins e ruídos", "detalhe": "Ruídos na suspensão dianteira e coxins do motor são queixas comuns.", "anoDe": 2018, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Volkswagen",
+    "modelo": "T-Cross",
+    "problemas": [
+      { "titulo": "Ruídos internos e infiltração", "detalhe": "Relatos de ruídos de acabamento e infiltração de água em unidades iniciais.", "anoDe": 2019, "anoAte": 2021 },
+      { "titulo": "Motor 1.0 TSI: velas e bobinas", "detalhe": "Mesmo padrão do Polo; veja histórico de troca.", "anoDe": 2019, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Honda",
+    "modelo": "Civic",
+    "problemas": [
+      { "titulo": "Câmbio CVT (geração 10)", "detalhe": "Ruídos e trancos podem indicar problemas no CVT. Confira trocas de fluido no prazo.", "anoDe": 2017, "anoAte": 2021 },
+      { "titulo": "Compressor do ar-condicionado", "detalhe": "Falha prematura do compressor é queixa recorrente; teste o ar por vários minutos.", "anoDe": 2017, "anoAte": 2021 },
+      { "titulo": "Motor 1.5 turbo: diluição de óleo", "detalhe": "Em uso urbano curto, combustível pode se misturar ao óleo. Verifique cheiro de gasolina na vareta.", "anoDe": 2017, "anoAte": 2021 }
+    ]
+  },
+  {
+    "marca": "Honda",
+    "modelo": "HR-V",
+    "problemas": [
+      { "titulo": "Câmbio CVT", "detalhe": "Verifique histórico de troca de fluido e ruídos em aceleração.", "anoDe": 2015, "anoAte": null },
+      { "titulo": "Bomba de combustível (recall)", "detalhe": "Unidades 2018 a 2019 tiveram recall da bomba de combustível. Confira se foi feito.", "anoDe": 2018, "anoAte": 2019 }
+    ]
+  },
+  {
+    "marca": "Toyota",
+    "modelo": "Corolla",
+    "problemas": [
+      { "titulo": "Câmbio CVT: ruído e trancos", "detalhe": "Geração 2015 a 2019 tem relatos de ruído no CVT. Troque o fluido conforme manual.", "anoDe": 2015, "anoAte": 2019 },
+      { "titulo": "Airbag Takata (recall)", "detalhe": "Unidades até 2015 entraram em recall de airbag. Confira no site da Toyota pelo chassi.", "anoDe": 2003, "anoAte": 2015 },
+      { "titulo": "Painel e acabamento", "detalhe": "Barulhos de painel e descolamento de acabamento são queixas frequentes.", "anoDe": 2015, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Hyundai",
+    "modelo": "HB20",
+    "problemas": [
+      { "titulo": "Motor 1.0 Kappa: bobinas e velas", "detalhe": "Falhas de ignição e consumo elevado podem ser bobinas; verifique histórico.", "anoDe": 2013, "anoAte": null },
+      { "titulo": "Corrente de comando (1.6)", "detalhe": "Ruído metálico a frio pode indicar corrente de comando esticada.", "anoDe": 2013, "anoAte": 2019 },
+      { "titulo": "Caixa de direção elétrica", "detalhe": "Ruídos e folga na coluna de direção aparecem com o tempo.", "anoDe": 2013, "anoAte": 2019 }
+    ]
+  },
+  {
+    "marca": "Chevrolet",
+    "modelo": "Onix",
+    "problemas": [
+      { "titulo": "Motor 1.0 turbo: recall de incêndio", "detalhe": "Unidades 2020 tiveram recall por risco de incêndio no motor. Confira se foi executado.", "anoDe": 2020, "anoAte": 2020 },
+      { "titulo": "Motor 1.0/1.4 antigo: corrente de comando", "detalhe": "Ruído de corrente a frio em motores da primeira geração.", "anoDe": 2013, "anoAte": 2019 },
+      { "titulo": "Câmbio automático 6 marchas", "detalhe": "Trancos entre marchas em unidades de maior quilometragem.", "anoDe": 2014, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Chevrolet",
+    "modelo": "Cruze",
+    "problemas": [
+      { "titulo": "Vazamento de óleo e bomba d'água", "detalhe": "Vazamentos na tampa de válvulas e bomba d'água são frequentes na geração 1.8.", "anoDe": 2011, "anoAte": 2016 },
+      { "titulo": "Motor 1.4 turbo: consumo de óleo", "detalhe": "Verifique nível e fumaça na partida.", "anoDe": 2017, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Jeep",
+    "modelo": "Compass",
+    "problemas": [
+      { "titulo": "Motor 2.0 flex: consumo de óleo", "detalhe": "Motor Tigershark tem relatos de consumo de óleo elevado. Confira o nível.", "anoDe": 2017, "anoAte": 2021 },
+      { "titulo": "Diesel: válvula EGR e DPF", "detalhe": "Uso urbano pode entupir o filtro de partículas. Verifique luzes no painel.", "anoDe": 2017, "anoAte": null },
+      { "titulo": "Central multimídia", "detalhe": "Travamentos e reinícios na central são queixas comuns.", "anoDe": 2017, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Jeep",
+    "modelo": "Renegade",
+    "problemas": [
+      { "titulo": "Motor 1.8 flex: consumo de óleo", "detalhe": "Relatos de consumo de óleo e de combustível acima do esperado.", "anoDe": 2015, "anoAte": 2021 },
+      { "titulo": "Câmbio automático de 9 marchas (diesel)", "detalhe": "Trancos e atualizações de software foram comuns; verifique histórico na concessionária.", "anoDe": 2015, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Ford",
+    "modelo": "Focus",
+    "problemas": [
+      { "titulo": "Câmbio PowerShift", "detalhe": "Transmissão de dupla embreagem a seco com histórico de trancos e trocas de embreagem. Avalie com muito cuidado.", "anoDe": 2013, "anoAte": 2019 }
+    ]
+  },
+  {
+    "marca": "Ford",
+    "modelo": "Fiesta",
+    "problemas": [
+      { "titulo": "Câmbio PowerShift", "detalhe": "Mesmo câmbio do Focus; trancos em baixa velocidade são sinal de desgaste.", "anoDe": 2013, "anoAte": 2019 }
+    ]
+  },
+  {
+    "marca": "Fiat",
+    "modelo": "Toro",
+    "problemas": [
+      { "titulo": "Diesel 2.0: EGR e turbo", "detalhe": "Verifique luzes de injeção e fumaça escura.", "anoDe": 2016, "anoAte": null },
+      { "titulo": "Flex 1.8/2.4: consumo de óleo", "detalhe": "Relatos de consumo elevado no motor 2.4 Tigershark.", "anoDe": 2016, "anoAte": 2021 }
+    ]
+  },
+  {
+    "marca": "Fiat",
+    "modelo": "Argo",
+    "problemas": [
+      { "titulo": "Motor 1.0 Firefly: velas e bobinas", "detalhe": "Falhas de ignição e marcha lenta irregular.", "anoDe": 2017, "anoAte": null },
+      { "titulo": "Caixa de direção", "detalhe": "Ruídos e folga na direção elétrica.", "anoDe": 2017, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Renault",
+    "modelo": "Kwid",
+    "problemas": [
+      { "titulo": "Motor 1.0 SCe: ruídos e vibração", "detalhe": "Vibração em marcha lenta é característica; ruídos anormais merecem checagem.", "anoDe": 2017, "anoAte": null },
+      { "titulo": "Acabamento e vedação", "detalhe": "Infiltração de água e ruídos internos são queixas comuns.", "anoDe": 2017, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Nissan",
+    "modelo": "Kicks",
+    "problemas": [
+      { "titulo": "Câmbio CVT", "detalhe": "Verifique trocas de fluido e trancos em aceleração.", "anoDe": 2016, "anoAte": null },
+      { "titulo": "Ruídos de suspensão", "detalhe": "Buchas e batentes desgastam cedo em piso ruim.", "anoDe": 2016, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Hyundai",
+    "modelo": "Creta",
+    "problemas": [
+      { "titulo": "Motor 2.0: consumo de óleo", "detalhe": "Relatos de consumo de óleo em unidades de maior quilometragem.", "anoDe": 2017, "anoAte": 2021 },
+      { "titulo": "Câmbio automático: trancos", "detalhe": "Verifique mudanças de marcha a frio.", "anoDe": 2017, "anoAte": null }
+    ]
+  },
+  {
+    "marca": "Toyota",
+    "modelo": "Hilux",
+    "problemas": [
+      { "titulo": "Diesel: sistema de injeção", "detalhe": "Bicos injetores e DPF em uso urbano. Verifique fumaça e histórico de limpeza.", "anoDe": 2016, "anoAte": null },
+      { "titulo": "Airbag Takata (recall)", "detalhe": "Modelos até 2015 entraram em recall de airbag.", "anoDe": 2005, "anoAte": 2015 }
+    ]
+  }
+]
