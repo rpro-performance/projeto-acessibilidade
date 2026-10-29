@@ -47,10 +47,12 @@ async function rolar(page, passos = 6) {
 // Sinais de que o site mostrou um desafio anti-robô em vez da listagem.
 async function pareceBloqueio(page) {
   const titulo = (await page.title()).toLowerCase();
-  const texto = ((await page.textContent("body").catch(() => "")) || "").toLowerCase().slice(0, 5000);
-  return /access denied|just a moment|attention required|verifique|verificação|captcha|não é um robô|bloqueado|press & hold|pressione e segure/.test(
-    titulo + " " + texto
-  );
+  const texto = ((await page.textContent("body").catch(() => "")) || "").toLowerCase().slice(0, 3000);
+  const frases = /access to this page has been denied|access denied|just a moment|attention required|pressione e segure|press & hold|press and hold|confirme que você é um humano|não sou um robô|i'm not a robot|captcha/;
+  if (frases.test(titulo)) return true;
+  // numa página de listagem normal o texto é longo e tem preços; uma página de desafio é curta
+  const curta = texto.length < 1500 && !/r\$\s?\d/.test(texto);
+  return curta && frases.test(texto);
 }
 
 // Quando o site pede uma verificação humana e a janela do Chrome está visível, espera a pessoa

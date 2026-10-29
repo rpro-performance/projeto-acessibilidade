@@ -39,6 +39,30 @@ function resumoNextData(html) {
   }
 }
 
+function resumoLdJson(html) {
+  const blocos = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
+  const linhas = [];
+  for (const b of blocos) {
+    try {
+      const d = JSON.parse(b);
+      const raiz = Array.isArray(d) ? d : d["@graph"] || [d];
+      for (const no of raiz) {
+        const tipo = String(no["@type"] || "?");
+        if (Array.isArray(no.itemListElement)) {
+          const primeiro = no.itemListElement[0];
+          const item = primeiro && (primeiro.item || primeiro);
+          linhas.push(`  ld+json ${tipo} com ${no.itemListElement.length} itens; primeiro: ${JSON.stringify(item).slice(0, 400)}`);
+        } else {
+          linhas.push(`  ld+json ${tipo}: ${Object.keys(no).slice(0, 12).join(", ")}`);
+        }
+      }
+    } catch {
+      linhas.push("  ld+json inválido");
+    }
+  }
+  return linhas.join("\n");
+}
+
 function resumoArquivo(arquivo) {
   const html = fs.readFileSync(arquivo, "utf8");
   const titulo = (html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || "";
@@ -48,15 +72,18 @@ function resumoArquivo(arquivo) {
   const precos = (t.match(/R\$\s?[\d.]{4,}/g) || []).length;
   const ldjson = (html.match(/application\/ld\+json/g) || []).length;
   const scriptsJson = (html.match(/<script[^>]*type="application\/json"[^>]*id="([^"]+)"/g) || []).map((s) => s.match(/id="([^"]+)"/)[1]);
-  const bloqueio = /access denied|just a moment|captcha|verifica|robô|robot|press & hold|pressione/i.test(titulo + " " + t.slice(0, 5000));
+  const exemplos = [...new Set((html.match(/https?:\/\/[a-z.]*olx\.com\.br\/[^"'\s]*-\d{7,}[^"'\s]*/g) || []).map((u) => u.split("?")[0]))].slice(0, 3);
+  const bloqueio = /access to this page has been denied|access denied|just a moment|attention required|pressione e segure|press & hold|confirme que você é um humano|não sou um robô|captcha/i.test(titulo + " " + t.slice(0, 3000));
   return [
     `== ${path.basename(arquivo)} (${Math.round(html.length / 1024)} KB)`,
     `  título: ${titulo.trim().slice(0, 120)}`,
     `  sinais de bloqueio: ${bloqueio ? "SIM" : "não"} · links OLX: ${linksOlx} · links /comprar/: ${linksWm} · preços "R$": ${precos} · ld+json: ${ldjson}`,
     `  scripts json com id: ${scriptsJson.join(", ") || "nenhum"}`,
     resumoNextData(html),
+    resumoLdJson(html),
+    exemplos.length ? `  links de exemplo:\n    ${exemplos.join("\n    ")}` : null,
     `  texto inicial: ${t.slice(0, 500)}`,
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 }
 
 function main() {

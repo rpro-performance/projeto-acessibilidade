@@ -72,14 +72,19 @@ async function extrairJsonLd(page, q) {
   for (const b of blocos) {
     try {
       const d = JSON.parse(b);
-      const lista = d.itemListElement || (Array.isArray(d) ? d : []);
+      const raiz = Array.isArray(d) ? d : d["@graph"] || [d];
+      const lista = [];
+      for (const no of raiz) {
+        if (no && Array.isArray(no.itemListElement)) lista.push(...no.itemListElement);
+        else if (no && no.url && (no.offers || /product|car|vehicle/i.test(String(no["@type"])))) lista.push(no);
+      }
       for (const it of lista) {
         const item = it.item || it;
-        if (!item || !item.url) continue;
+        if (!item || !item.url || !/-\d{7,}/.test(item.url)) continue;
         const offer = item.offers || {};
         itens.push(
           anuncio({
-            id: (item.url.match(/-(\d{6,})/) || [])[1] || item.url,
+            id: (item.url.match(/-(\d{7,})/) || [])[1] || item.url,
             fonte: "olx",
             fonteNome: "OLX",
             url: item.url,
@@ -89,7 +94,7 @@ async function extrairJsonLd(page, q) {
             ano: item.vehicleModelDate || item.productionDate,
             anoModelo: item.vehicleModelDate,
             km: item.mileageFromOdometer?.value,
-            preco: offer.price,
+            preco: offer.price ?? offer.lowPrice ?? (Array.isArray(offer) ? offer[0]?.price : null),
             foto: Array.isArray(item.image) ? item.image[0] : item.image,
             descricao: item.description,
           })
@@ -107,26 +112,33 @@ async function extrairDom(page, q) {
     const vistos = new Set();
     const saida = [];
     for (const a of document.querySelectorAll('a[href*="olx.com.br/"]')) {
-      const href = a.href;
-      if (!/-\d{7,}(?:[?#]|$)/.test(href) || vistos.has(href)) continue;
-      const card = a.closest("li, article, section, div") || a;
+      const href = a.href.split("#")[0];
+      if (!/-\d{7,}(?:\?|$)/.test(href) || vistos.has(href)) continue;
+      // sobe na árvore até achar o card inteiro (o que tem o preço)
+      let card = a;
+      for (let i = 0; i < 7 && card.parentElement; i++) {
+        if (/R\$\s?[\d.]{4,}/.test(card.innerText || "")) break;
+        card = card.parentElement;
+      }
       const texto = card.innerText || "";
-      if (!/R\$\s?[\d.]+/.test(texto)) continue;
+      if (!/R\$\s?[\d.]{4,}/.test(texto)) continue;
       vistos.add(href);
-      const titulo = (a.querySelector("h2, h3") || card.querySelector("h2, h3") || a).innerText.trim();
+      const h = a.querySelector("h2, h3") || card.querySelector("h2, h3");
+      const titulo = (h ? h.innerText : a.getAttribute("title") || a.innerText).trim().split("\n")[0];
       const img = card.querySelector("img");
-      saida.push({ href, titulo, texto, foto: img ? img.src : null });
+      saida.push({ href, titulo, texto, foto: img ? img.currentSrc || img.src : null });
     }
     return saida;
   });
   return cards.map((c) => {
-    const preco = (c.texto.match(/R\$\s?([\d.]+)/) || [])[1];
-    const ano = (c.texto.match(/\b(19|20)\d{2}\b/) || [])[0];
-    const km = (c.texto.match(/([\d.]+)\s*km/i) || [])[1];
-    const local = (c.texto.match(/\n([^\n]+ - [A-Z]{2})\b/) || [])[1] || "";
-    const [cidade, uf] = local.split(" - ");
+    const linhas = c.texto.split("\n").map((l) => l.trim()).filter(Boolean);
+    const preco = (c.texto.match(/R\$\s?([\d.]{4,})/) || [])[1];
+    const km = (c.texto.match(/([\d.]+)\s*km\b/i) || [])[1];
+    const ano = (c.texto.match(/\b((?:19|20)\d{2})\b/) || [])[1];
+    const local = linhas.find((l) => /^[^\d]{3,}, [A-Z]{2}$| - [A-Z]{2}$/.test(l)) || "";
+    const [cidade, uf] = local.split(/,\s*| - /);
     return anuncio({
-      id: (c.href.match(/-(\d{6,})/) || [])[1] || c.href,
+      id: (c.href.match(/-(\d{7,})(?:\?|$)/) || [])[1] || c.href,
       fonte: "olx",
       fonteNome: "OLX",
       url: c.href,
@@ -137,7 +149,7 @@ async function extrairDom(page, q) {
       anoModelo: ano,
       km,
       preco,
-      cambio: /autom[aá]tico/i.test(c.texto) ? "Automático" : /manual/i.test(c.texto) ? "Manual" : null,
+      cambio: /autom[aá]tic/i.test(c.texto) ? "Automático" : /\bmanual\b/i.test(c.texto) ? "Manual" : null,
       combustivel: (c.texto.match(/flex|gasolina|diesel|h[ií]brido|el[eé]trico/i) || [])[0],
       cidade,
       estado: uf,
@@ -165,8 +177,17 @@ async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000
       let lista = null;
       const ads = await extrairNextData(page);
       if (ads) lista = ads.map((ad) => deNextData(ad, q)).filter((a) => a.url);
-      if (!lista || !lista.length) lista = await extrairJsonLd(page, q);
-      if (!lista || !lista.length) lista = await extrairDom(page, q);
+      if (!lista || !lista.length) {
+        // JSON-LD traz preço/foto/link confiáveis; o DOM traz km, cidade e câmbio. Junta os dois por id.
+        const porId = new Map();
+        for (const a of await extrairJsonLd(page, q)) porId.set(a.id, a);
+        for (const a of await extrairDom(page, q)) {
+          const base = porId.get(a.id);
+          if (!base) porId.set(a.id, a);
+          else for (const k of Object.keys(a)) if ((base[k] == null || base[k] === "") && a[k] != null && a[k] !== "") base[k] = a[k];
+        }
+        lista = [...porId.values()];
+      }
       if (!lista.length) {
         const base = await salvarDebug(page, "olx-vazio");
         if (n === 1) throw new Error(`nenhum anúncio reconhecido na OLX (página salva em ${base}.html)`);
