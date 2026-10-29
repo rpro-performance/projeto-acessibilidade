@@ -5,7 +5,7 @@
 
 const { anuncio } = require("../../src/normalize");
 const { slug } = require("../../src/http");
-const { pausa, rolar, pareceBloqueio, salvarDebug } = require("../navegador");
+const { pausa, rolar, pareceBloqueio, aguardarHumano, salvarDebug } = require("../navegador");
 
 const BASE = "https://www.webmotors.com.br";
 
@@ -103,7 +103,7 @@ async function extrairDom(page, q) {
   });
 }
 
-async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000 } } = {}) {
+async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000 }, visivel = true } = {}) {
   const page = await contexto.newPage();
   const resultados = [];
   const capturados = [];
@@ -124,9 +124,14 @@ async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000
       await pausa(ritmo.min, ritmo.max);
       await rolar(page);
       if (await pareceBloqueio(page)) {
-        const base = await salvarDebug(page, "webmotors-bloqueio");
-        throw new Error(`Webmotors mostrou um desafio anti-robô (captura em ${base}.png)`);
+        const liberou = visivel && (await aguardarHumano(page));
+        if (!liberou) {
+          const base = await salvarDebug(page, "webmotors-bloqueio");
+          throw new Error(`Webmotors pediu verificação humana e ela não foi resolvida (captura em ${base}.png)`);
+        }
+        await rolar(page);
       }
+      if (!capturados.length) await page.waitForSelector('a[href*="/comprar/"]', { timeout: 15000 }).catch(() => {});
       let lista = capturados.length ? capturados.map(deApi) : await extrairDom(page, q);
       if (!lista.length) {
         const base = await salvarDebug(page, "webmotors-vazio");

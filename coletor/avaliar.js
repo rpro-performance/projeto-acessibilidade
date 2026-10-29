@@ -4,7 +4,14 @@
 const db = require("../src/db");
 const problemas = require("../src/problemas");
 
+// Preço muito abaixo da FIPE (ou irrisório) é quase sempre erro, parcela ou golpe.
+function precoSuspeito(a) {
+  if (a.preco != null && a.preco < 5000) return true;
+  return Boolean(a.fipe && a.fipe.diferencaPct != null && a.fipe.diferencaPct <= -60);
+}
+
 function pontuar(a) {
+  if (precoSuspeito(a)) return -100;
   let pontos = 0;
   if (a.fipe && a.fipe.diferencaPct != null) pontos += Math.max(-30, -a.fipe.diferencaPct) * 2; // 10% abaixo = +20
   if (a.km != null) pontos += a.km < 30000 ? 10 : a.km < 60000 ? 5 : a.km > 150000 ? -10 : 0;
@@ -15,6 +22,7 @@ function pontuar(a) {
 
 function motivos(a) {
   const m = [];
+  if (precoSuspeito(a)) return ["preço suspeito, confira o anúncio"];
   if (a.fipe && a.fipe.diferencaPct <= -5) m.push(`${Math.abs(a.fipe.diferencaPct)}% abaixo da FIPE`);
   if (a.precoAnterior && a.preco < a.precoAnterior) {
     m.push(`caiu de R$ ${Math.round(a.precoAnterior).toLocaleString("pt-BR")} para R$ ${Math.round(a.preco).toLocaleString("pt-BR")}`);
@@ -60,4 +68,4 @@ function avaliar(banco, data) {
   return { data, contagens, oportunidades, porBusca: Object.values(porBusca), listas };
 }
 
-module.exports = { avaliar, pontuar, motivos };
+module.exports = { avaliar, pontuar, motivos, precoSuspeito };

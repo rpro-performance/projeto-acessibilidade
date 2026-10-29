@@ -195,7 +195,8 @@ function linhaParaAnuncio(l) {
 const CONSULTAS = {
   novos: (data) => ["primeira_vez = ? AND ativo = 1", [data]],
   quedas: (data) => ["preco_alterado_em = ? AND preco_anterior IS NOT NULL AND preco < preco_anterior AND ativo = 1", [data]],
-  "abaixo-fipe": () => ["fipe_pct IS NOT NULL AND fipe_pct <= -5 AND ativo = 1", []],
+  // abaixo de -60% quase sempre é erro de digitação ou parcela, não preço do carro
+  "abaixo-fipe": () => ["fipe_pct IS NOT NULL AND fipe_pct <= -5 AND fipe_pct > -60 AND ativo = 1", []],
   sumiram: (data) => ["ativo = 0 AND inativo_em = ?", [data]],
   todos: () => ["ativo = 1", []],
 };
@@ -216,7 +217,7 @@ function contagens(db, data) {
     ativos: c("ativo = 1"),
     novos: c("primeira_vez = ? AND ativo = 1", [data]),
     quedas: c("preco_alterado_em = ? AND preco_anterior IS NOT NULL AND preco < preco_anterior AND ativo = 1", [data]),
-    abaixoFipe: c("fipe_pct IS NOT NULL AND fipe_pct <= -5 AND ativo = 1"),
+    abaixoFipe: c("fipe_pct IS NOT NULL AND fipe_pct <= -5 AND fipe_pct > -60 AND ativo = 1"),
     sumiram: c("ativo = 0 AND inativo_em = ?", [data]),
   };
 }

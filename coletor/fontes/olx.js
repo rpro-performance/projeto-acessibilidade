@@ -4,7 +4,7 @@
 // captura de tela em ~/.veiculomais/debug para ajuste.
 
 const { anuncio } = require("../../src/normalize");
-const { pausa, rolar, pareceBloqueio, salvarDebug } = require("../navegador");
+const { pausa, rolar, pareceBloqueio, aguardarHumano, salvarDebug } = require("../navegador");
 
 const BASE = "https://www.olx.com.br";
 
@@ -65,13 +65,50 @@ async function extrairNextData(page) {
   }
 }
 
+// Alguns layouts expõem a lista como JSON-LD (ItemList de Product/Car).
+async function extrairJsonLd(page, q) {
+  const blocos = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => e.textContent));
+  const itens = [];
+  for (const b of blocos) {
+    try {
+      const d = JSON.parse(b);
+      const lista = d.itemListElement || (Array.isArray(d) ? d : []);
+      for (const it of lista) {
+        const item = it.item || it;
+        if (!item || !item.url) continue;
+        const offer = item.offers || {};
+        itens.push(
+          anuncio({
+            id: (item.url.match(/-(\d{6,})/) || [])[1] || item.url,
+            fonte: "olx",
+            fonteNome: "OLX",
+            url: item.url,
+            titulo: item.name,
+            marca: item.brand?.name || q.marca,
+            modelo: item.model || q.modelo,
+            ano: item.vehicleModelDate || item.productionDate,
+            anoModelo: item.vehicleModelDate,
+            km: item.mileageFromOdometer?.value,
+            preco: offer.price,
+            foto: Array.isArray(item.image) ? item.image[0] : item.image,
+            descricao: item.description,
+          })
+        );
+      }
+    } catch {
+      // bloco que não é lista de anúncios
+    }
+  }
+  return itens;
+}
+
 async function extrairDom(page, q) {
   const cards = await page.evaluate(() => {
     const vistos = new Set();
     const saida = [];
     for (const a of document.querySelectorAll('a[href*="olx.com.br/"]')) {
       const href = a.href;
-      if (!/\/autos-e-pecas\/.*-\d{6,}/.test(href) || vistos.has(href)) continue;
+      if (!/-\d{7,}(?:[?#]|$)/.test(href) || vistos.has(href)) continue;
       const card = a.closest("li, article, section, div") || a;
       const texto = card.innerText || "";
       if (!/R\$\s?[\d.]+/.test(texto)) continue;
@@ -109,21 +146,26 @@ async function extrairDom(page, q) {
   });
 }
 
-async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000 } } = {}) {
+async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000 }, visivel = true } = {}) {
   const page = await contexto.newPage();
   const resultados = [];
   try {
     for (let n = 1; n <= paginas; n++) {
       await page.goto(montarUrl(q, n), { waitUntil: "domcontentloaded", timeout: 60000 });
       await pausa(ritmo.min, ritmo.max);
-      await rolar(page);
       if (await pareceBloqueio(page)) {
-        const base = await salvarDebug(page, "olx-bloqueio");
-        throw new Error(`OLX mostrou um desafio anti-robô (captura em ${base}.png)`);
+        const liberou = visivel && (await aguardarHumano(page));
+        if (!liberou) {
+          const base = await salvarDebug(page, "olx-bloqueio");
+          throw new Error(`OLX pediu verificação humana e ela não foi resolvida (captura em ${base}.png)`);
+        }
       }
+      await page.waitForSelector('a[href*="olx.com.br/"]', { timeout: 15000 }).catch(() => {});
+      await rolar(page);
       let lista = null;
       const ads = await extrairNextData(page);
       if (ads) lista = ads.map((ad) => deNextData(ad, q)).filter((a) => a.url);
+      if (!lista || !lista.length) lista = await extrairJsonLd(page, q);
       if (!lista || !lista.length) lista = await extrairDom(page, q);
       if (!lista.length) {
         const base = await salvarDebug(page, "olx-vazio");

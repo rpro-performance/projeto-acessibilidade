@@ -53,6 +53,21 @@ async function pareceBloqueio(page) {
   );
 }
 
+// Quando o site pede uma verificação humana e a janela do Chrome está visível, espera a pessoa
+// resolver (até `segundos`). Devolve true se a página liberou.
+async function aguardarHumano(page, segundos = 120) {
+  const limite = Date.now() + segundos * 1000;
+  console.log(`  >> O site pediu uma verificação. Resolva na janela do Chrome (até ${segundos} s)...`);
+  while (Date.now() < limite) {
+    await pausa(3000, 3000);
+    if (!(await pareceBloqueio(page))) {
+      await pausa(1500, 3000);
+      return true;
+    }
+  }
+  return false;
+}
+
 async function salvarDebug(page, nome) {
   fs.mkdirSync(DEBUG, { recursive: true });
   const base = path.join(DEBUG, `${nome}-${Date.now()}`);
@@ -65,4 +80,4 @@ async function salvarDebug(page, nome) {
   return base;
 }
 
-module.exports = { abrirNavegador, pausa, rolar, pareceBloqueio, salvarDebug, PERFIL, DEBUG };
+module.exports = { abrirNavegador, pausa, rolar, pareceBloqueio, aguardarHumano, salvarDebug, PERFIL, DEBUG };

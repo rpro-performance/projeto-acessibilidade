@@ -10,7 +10,8 @@
     "coletar:invisivel": "node coletor/index.js --invisivel",
     "coletar:rapido": "node coletor/index.js --sem-navegador",
     "agendar:mac": "bash coletor/instalar-mac.sh",
-    "desagendar:mac": "bash coletor/desinstalar-mac.sh"
+    "desagendar:mac": "bash coletor/desinstalar-mac.sh",
+    "diagnostico": "node coletor/diagnostico.js"
   },
   "engines": {
     "node": ">=22.13"

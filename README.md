@@ -135,11 +135,14 @@ Para o agendamento usar a chave, exporte a variável antes de rodar `npm run age
 | `npm run coletar:invisivel` | mesmo, sem janela |
 | `npm run coletar:rapido` | só Mobiauto, Na Pista e Chaves na Mão (sem navegador, uns 10 s) |
 | `node coletor/index.js --busca "Jetta GLI" --fontes olx,webmotors` | uma busca, fontes escolhidas |
+| `npm run diagnostico` | resume as páginas salvas em debug para ajustar os conectores |
 | `npm run desagendar:mac` | remove o agendamento |
 
 ### Se OLX ou Webmotors falharem
 
-Os conectores desses dois sites foram escritos sem acesso direto a eles (bloqueiam servidores), então a primeira rodada pode precisar de ajuste. Quando nada é reconhecido, o coletor salva o HTML e uma captura de tela em `~/.veiculomais/debug/`. Mande esses arquivos (ou a mensagem de erro do log em `~/.veiculomais/coletor.log`) e o conector é corrigido. As outras fontes continuam funcionando enquanto isso.
+- **Verificação humana.** A Webmotors (e às vezes a OLX) mostra um desafio do tipo "pressione e segure". Com a janela do Chrome visível, o coletor espera até 2 minutos para você resolver na própria janela e segue em frente. O perfil guarda a sessão, então nas próximas coletas normalmente não pede de novo. Por isso a primeira coleta deve ser com janela visível (`npm run coletar`), não com `coletar:invisivel`.
+- **Nada reconhecido.** Os conectores desses dois sites foram escritos sem acesso direto a eles (bloqueiam servidores). Quando nada é reconhecido, o coletor salva o HTML e uma captura em `~/.veiculomais/debug/`. Rode `npm run diagnostico` e cole a saída na conversa: ela resume o que veio na página sem precisar enviar o arquivo inteiro.
+- As outras fontes continuam funcionando enquanto isso.
 
 ### Limites
 

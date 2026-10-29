@@ -107,7 +107,7 @@ async function main() {
       }
       try {
         const lista = fonte.navegador
-          ? await fonte.buscar(contexto, f, { paginas, ritmo })
+          ? await fonte.buscar(contexto, f, { paginas, ritmo, visivel: !opts.invisivel })
           : await fonte.buscar(f);
         const filtrados = lista.filter((a) => passaFiltros(a, f));
         let novos = 0;
