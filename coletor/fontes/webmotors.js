@@ -133,6 +133,8 @@ async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000
       }
       if (!capturados.length) await page.waitForSelector('a[href*="/comprar/"]', { timeout: 15000 }).catch(() => {});
       let lista = capturados.length ? capturados.map(deApi) : await extrairDom(page, q);
+      const vistos = new Set(resultados.map((a) => a.id));
+      lista = lista.filter((a) => (vistos.has(a.id) ? false : vistos.add(a.id)));
       if (!lista.length) {
         const base = await salvarDebug(page, "webmotors-vazio");
         if (n === 1) throw new Error(`nenhum anúncio reconhecido na Webmotors (página salva em ${base}.html)`);

@@ -34,9 +34,9 @@ function deNextData(ad, q) {
     fonteNome: "OLX",
     url: ad.url || ad.friendlyUrl,
     titulo: ad.subject || ad.title,
-    marca: prop(ad, "vehicle_brand") || q.marca,
-    modelo: prop(ad, "vehicle_model") || q.modelo,
-    versao: prop(ad, "vehicle_version") || "",
+    marca: prop(ad, "vehicle_brand") || dividirTitulo(ad.subject || ad.title, q).marca,
+    modelo: prop(ad, "vehicle_model") || dividirTitulo(ad.subject || ad.title, q).modelo,
+    versao: prop(ad, "vehicle_version") || dividirTitulo(ad.subject || ad.title, q).versao,
     ano,
     anoModelo: ano,
     km: prop(ad, "mileage"),
@@ -82,6 +82,7 @@ async function extrairJsonLd(page, q) {
         const item = it.item || it;
         if (!item || !item.url || !/-\d{7,}/.test(item.url)) continue;
         const offer = item.offers || {};
+        const t = dividirTitulo(item.name, q);
         itens.push(
           anuncio({
             id: (item.url.match(/-(\d{7,})/) || [])[1] || item.url,
@@ -89,8 +90,9 @@ async function extrairJsonLd(page, q) {
             fonteNome: "OLX",
             url: item.url,
             titulo: item.name,
-            marca: item.brand?.name || q.marca,
-            modelo: item.model || q.modelo,
+            marca: item.brand?.name || t.marca,
+            modelo: item.model || t.modelo,
+            versao: t.versao,
             ano: item.vehicleModelDate || item.productionDate,
             anoModelo: item.vehicleModelDate,
             km: item.mileageFromOdometer?.value,
@@ -107,26 +109,44 @@ async function extrairJsonLd(page, q) {
   return itens;
 }
 
+// Separa marca/modelo/versão a partir do título do anúncio ("Volkswagen Jetta Gli 2023").
+function dividirTitulo(titulo, q) {
+  const tokens = String(titulo || "").trim().split(/\s+/).filter(Boolean);
+  const marcaTokens = String(q.marca || "").toLowerCase().split(/\s+/).filter(Boolean);
+  let i = 0;
+  while (i < tokens.length && marcaTokens.includes(tokens[i].toLowerCase())) i++;
+  const modelo = tokens[i] || "";
+  const resto = tokens.slice(i + 1).filter((t) => !/^(19|20)\d{2}(\/(19|20)\d{2})?$/.test(t));
+  return { marca: q.marca || tokens[0] || "", modelo, versao: resto.join(" ") };
+}
+
 async function extrairDom(page, q) {
   const cards = await page.evaluate(() => {
+    const idDe = (a) => ((a.href || "").split("#")[0].match(/-(\d{7,})(?:\?|$)/) || [])[1] || null;
+    const links = [...document.querySelectorAll('a[href*="olx.com.br/"]')].filter(idDe);
     const vistos = new Set();
     const saida = [];
-    for (const a of document.querySelectorAll('a[href*="olx.com.br/"]')) {
-      const href = a.href.split("#")[0];
-      if (!/-\d{7,}(?:\?|$)/.test(href) || vistos.has(href)) continue;
-      // sobe na árvore até achar o card inteiro (o que tem o preço)
+    for (const a of links) {
+      const id = idDe(a);
+      if (vistos.has(id)) continue;
+      // o card é o maior ancestral que contém só links deste anúncio
       let card = a;
-      for (let i = 0; i < 7 && card.parentElement; i++) {
-        if (/R\$\s?[\d.]{4,}/.test(card.innerText || "")) break;
-        card = card.parentElement;
+      while (card.parentElement && card.parentElement !== document.body) {
+        const pai = card.parentElement;
+        const temOutro = [...pai.querySelectorAll('a[href*="olx.com.br/"]')].some((x) => {
+          const outro = idDe(x);
+          return outro && outro !== id;
+        });
+        if (temOutro) break;
+        card = pai;
       }
       const texto = card.innerText || "";
       if (!/R\$\s?[\d.]{4,}/.test(texto)) continue;
-      vistos.add(href);
-      const h = a.querySelector("h2, h3") || card.querySelector("h2, h3");
+      vistos.add(id);
+      const h = card.querySelector("h2, h3");
       const titulo = (h ? h.innerText : a.getAttribute("title") || a.innerText).trim().split("\n")[0];
       const img = card.querySelector("img");
-      saida.push({ href, titulo, texto, foto: img ? img.currentSrc || img.src : null });
+      saida.push({ id, href: a.href.split("#")[0], titulo, texto, foto: img ? img.currentSrc || img.src : null });
     }
     return saida;
   });
@@ -135,16 +155,20 @@ async function extrairDom(page, q) {
     const preco = (c.texto.match(/R\$\s?([\d.]{4,})/) || [])[1];
     const km = (c.texto.match(/([\d.]+)\s*km\b/i) || [])[1];
     const ano = (c.texto.match(/\b((?:19|20)\d{2})\b/) || [])[1];
-    const local = linhas.find((l) => /^[^\d]{3,}, [A-Z]{2}$| - [A-Z]{2}$/.test(l)) || "";
-    const [cidade, uf] = local.split(/,\s*| - /);
+    const local = linhas.find((l) => /^[^\d|]{3,}(,\s*[^\d|]+)?\s*-\s*[A-Z]{2}$/.test(l)) || "";
+    const partes = local.split(/\s*-\s*/);
+    const uf = partes.length > 1 ? partes[partes.length - 1] : null;
+    const cidade = partes.length > 1 ? partes[0].split(",")[0] : null;
+    const t = dividirTitulo(c.titulo, q);
     return anuncio({
-      id: (c.href.match(/-(\d{7,})(?:\?|$)/) || [])[1] || c.href,
+      id: c.id,
       fonte: "olx",
       fonteNome: "OLX",
       url: c.href,
       titulo: c.titulo,
-      marca: q.marca,
-      modelo: q.modelo,
+      marca: t.marca,
+      modelo: t.modelo,
+      versao: t.versao,
       ano,
       anoModelo: ano,
       km,

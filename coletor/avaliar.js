@@ -50,7 +50,7 @@ function avaliar(banco, data) {
     const b = porBusca[a.busca] || (porBusca[a.busca] = { busca: a.busca, total: 0, novos: 0, precoMin: null, precoMedio: 0, soma: 0, comPreco: 0 });
     b.total++;
     if (a.primeiraVez === data) b.novos++;
-    if (a.preco) {
+    if (a.preco && !precoSuspeito(a)) {
       b.soma += a.preco;
       b.comPreco++;
       b.precoMin = b.precoMin == null ? a.preco : Math.min(b.precoMin, a.preco);
