@@ -6,6 +6,6 @@
     { "nome": "Corolla", "marca": "Toyota", "modelo": "Corolla", "anoDe": 2020, "precoAte": 160000 }
   ],
   "fontes": ["mobiauto", "napista", "chavesnamao", "olx", "webmotors"],
-  "paginasPorFonte": 2,
+  "paginasPorFonte": { "padrao": 2, "webmotors": 1 },
   "ritmoMs": { "min": 2500, "max": 6000 }
 }

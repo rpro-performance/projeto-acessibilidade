@@ -140,7 +140,7 @@ Para o agendamento usar a chave, exporte a variável antes de rodar `npm run age
 
 ### Se OLX ou Webmotors falharem
 
-- **Verificação humana.** A Webmotors (e às vezes a OLX) mostra um desafio do tipo "pressione e segure". Com a janela do Chrome visível, o coletor espera até 2 minutos para você resolver na própria janela e segue em frente. O perfil guarda a sessão, então nas próximas coletas normalmente não pede de novo. Por isso a primeira coleta deve ser com janela visível (`npm run coletar`), não com `coletar:invisivel`.
+- **Verificação humana.** A Webmotors mostra um desafio do tipo "pressione e segure". Com a janela do Chrome visível, o coletor espera até 2 minutos para você resolver na própria janela e segue em frente. O coletor não tenta resolver esse desafio sozinho: ele existe justamente para impedir acesso automático. Para pedir menos vezes, a Webmotors lê só a primeira página de cada busca (`paginasPorFonte.webmotors` em `coletor/buscas.json`). Na coleta agendada, sem ninguém para responder, a Webmotors fica de fora daquele dia e as outras fontes seguem.
 - **Nada reconhecido.** Os conectores desses dois sites foram escritos sem acesso direto a eles (bloqueiam servidores). Quando nada é reconhecido, o coletor salva o HTML e uma captura em `~/.veiculomais/debug/`. Rode `npm run diagnostico` e cole a saída na conversa: ela resume o que veio na página sem precisar enviar o arquivo inteiro.
 - As outras fontes continuam funcionando enquanto isso.
 
