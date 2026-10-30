@@ -118,14 +118,13 @@ OLX e Webmotors bloqueiam servidores, mas não bloqueiam uma pessoa no Chrome. O
 
 ### Resumo do dia por IA
 
-Com uma chave da Anthropic no ambiente, o Claude escreve a avaliação do dia (visão geral, oportunidades com o que checar, o que sumiu). Sem chave, sai um resumo automático simples.
+Com uma chave da Anthropic (console.anthropic.com > API Keys), o Claude escreve a avaliação do dia (visão geral, oportunidades com o que checar, o que sumiu). Sem chave, sai um resumo automático simples.
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-npm run coletar
+npm run chave
 ```
 
-Para o agendamento usar a chave, exporte a variável antes de rodar `npm run agendar:mac` (o script grava a chave no agendamento).
+O comando pede a chave e guarda em `~/.veiculomais/config.json`. O coletor, o servidor e a coleta agendada leem dali. A variável de ambiente `ANTHROPIC_API_KEY`, se existir, tem prioridade.
 
 ### Comandos úteis
 
@@ -135,6 +134,8 @@ Para o agendamento usar a chave, exporte a variável antes de rodar `npm run age
 | `npm run coletar:invisivel` | mesmo, sem janela |
 | `npm run coletar:rapido` | só Mobiauto, Na Pista e Chaves na Mão (sem navegador, uns 10 s) |
 | `node coletor/index.js --busca "Jetta GLI" --fontes olx,webmotors` | uma busca, fontes escolhidas |
+| `npm run chave` | guarda a chave da Anthropic para o resumo por IA |
+| `node coletor/limpar.js olx` | apaga do banco os anúncios de uma fonte |
 | `npm run diagnostico` | resume as páginas salvas em debug para ajustar os conectores |
 | `npm run desagendar:mac` | remove o agendamento |
 

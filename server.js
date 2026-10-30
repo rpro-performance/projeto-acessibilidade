@@ -8,6 +8,7 @@ const { buscar } = require("./src/search");
 const { fontes } = require("./src/connectors");
 const fipe = require("./src/fipe");
 const db = require("./src/db");
+require("./src/config").aplicarAmbiente();
 
 const PORT = Number(process.env.PORT || 3000);
 const RAIZ = __dirname;

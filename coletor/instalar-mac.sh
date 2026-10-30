@@ -27,7 +27,6 @@ cat > "$PLIST" <<PLIST
   <key>EnvironmentVariables</key>
   <dict>
     <key>PATH</key><string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
-    <key>ANTHROPIC_API_KEY</key><string>${ANTHROPIC_API_KEY:-}</string>
   </dict>
 </dict>
 </plist>
@@ -35,5 +34,6 @@ PLIST
 launchctl unload "$PLIST" 2>/dev/null || true
 launchctl load "$PLIST"
 echo "Agendado: todo dia às $(printf '%02d:%02d' "$HORA" "$MINUTO"). Log em ~/.veiculomais/coletor.log"
+echo "Resumo por IA: guarde a chave com 'npm run chave' (fica em ~/.veiculomais/config.json)."
 echo "Para rodar agora:   launchctl start br.com.veiculomais.coletor"
 echo "Para desinstalar:   bash coletor/desinstalar-mac.sh"

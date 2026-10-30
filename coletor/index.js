@@ -12,6 +12,7 @@
 const fs = require("fs");
 const path = require("path");
 const db = require("../src/db");
+require("../src/config").aplicarAmbiente();
 const fipe = require("../src/fipe");
 const { passaFiltros } = require("../src/search");
 const { porChave: fontesServidor } = require("../src/connectors");
