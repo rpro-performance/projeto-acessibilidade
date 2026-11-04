@@ -12,7 +12,8 @@
     "agendar:mac": "bash coletor/instalar-mac.sh",
     "desagendar:mac": "bash coletor/desinstalar-mac.sh",
     "diagnostico": "node coletor/diagnostico.js",
-    "chave": "node coletor/chave.js"
+    "chave": "node coletor/chave.js",
+    "relatorio": "node --no-warnings coletor/relatorio.js"
   },
   "engines": {
     "node": ">=22.13"

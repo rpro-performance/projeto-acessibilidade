@@ -134,6 +134,7 @@ O comando pede a chave e guarda em `~/.veiculomais/config.json`. O coletor, o se
 | `npm run coletar:invisivel` | mesmo, sem janela |
 | `npm run coletar:rapido` | só Mobiauto, Na Pista e Chaves na Mão (sem navegador, uns 10 s) |
 | `node coletor/index.js --busca "Jetta GLI" --fontes olx,webmotors` | uma busca, fontes escolhidas |
+| `npm run relatorio` | mostra o resultado da última coleta num bloco curto |
 | `npm run chave` | guarda a chave da Anthropic para o resumo por IA |
 | `node coletor/limpar.js olx` | apaga do banco os anúncios de uma fonte |
 | `npm run diagnostico` | resume as páginas salvas em debug para ajustar os conectores |
