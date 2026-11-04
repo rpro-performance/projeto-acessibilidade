@@ -89,60 +89,61 @@ Os conectores leem o HTML público dos sites, então uma mudança de layout pode
 
 A ficha de problemas conhecidos (`data/problemas-conhecidos.json`) é curada à mão, com relatos comuns de proprietários para os modelos mais vendidos. Não substitui laudo cautelar.
 
-## Coletor diário (roda no seu Mac)
+## App no Mac
 
-OLX e Webmotors bloqueiam servidores, mas não bloqueiam uma pessoa no Chrome. O coletor roda no seu computador, abre o seu Chrome (num perfil próprio do Veículo Mais), visita os sites em ritmo humano, lê os anúncios das buscas que você definiu e guarda tudo num banco local. Todo dia ele compara com o dia anterior e monta a avaliação: novos, quedas de preço, abaixo da FIPE, sumidos (provavelmente vendidos) e as melhores oportunidades. A página **Hoje** (`dia.html`) mostra isso.
+O Veículo Mais roda como um app no seu Mac. OLX e Webmotors bloqueiam servidores, mas não bloqueiam uma pessoa no Chrome, então a coleta acontece no seu computador: o app abre o seu Chrome (num perfil próprio), visita os sites em ritmo humano, lê os anúncios das buscas que você escolheu e guarda tudo num banco local. Todo dia ele compara com os dias anteriores e monta a avaliação: novos, quedas de preço, abaixo da FIPE, vendidos e as melhores oportunidades.
 
-### Instalação no Mac
+### Instalar (uma vez)
 
-1. Instale o Node 22 ou mais novo: `brew install node` ou pelo instalador em https://nodejs.org.
-2. Na pasta do projeto, instale as dependências do coletor (Playwright e SDK da Anthropic):
+1. Instale o Node 22.13 ou mais novo: `brew install node`.
+2. Baixe o projeto e instale o app:
    ```bash
-   npm install
+   cd ~/dev
+   git clone https://github.com/rpro-performance/projeto-acessibilidade.git
+   cd projeto-acessibilidade
+   git checkout claude/friendly-hypatia-j3n3kc
+   npm run instalar
    ```
-3. Edite `coletor/buscas.json` com os carros que você quer acompanhar (marca, modelo, ano, preço, região).
-4. Rode a primeira coleta com a janela do Chrome visível, para ver tudo acontecendo:
-   ```bash
-   npm run coletar
-   ```
-   O banco fica em `~/.veiculomais/veiculomais.db`. Se um site mostrar captcha, resolva na janela; o perfil guarda a sessão para as próximas vezes.
-5. Agende para rodar todo dia (padrão 6h; o Mac precisa estar ligado e com você logado):
-   ```bash
-   npm run agendar:mac            # ou: bash coletor/instalar-mac.sh 7 30  (7h30)
-   ```
-6. Suba o site e abra a página Hoje:
-   ```bash
-   npm start
-   # http://localhost:3000/dia.html
-   ```
+3. O instalador cria o app **Veículo Mais** em Aplicativos (com ícone), liga o serviço em segundo plano e abre o app. Arraste o ícone para o Dock, se quiser.
 
-### Resumo do dia por IA
+Depois disso, o terminal não é mais necessário:
 
-Com uma chave da Anthropic (console.anthropic.com > API Keys), o Claude escreve a avaliação do dia (visão geral, oportunidades com o que checar, o que sumiu). Sem chave, sai um resumo automático simples.
+- **Abrir:** clique em Veículo Mais em Aplicativos ou no Dock. A janela abre no endereço `http://localhost:3737`.
+- **Coletar agora:** botão no topo de qualquer tela, com o andamento ao vivo.
+- **Coleta automática:** o serviço liga junto com o Mac e coleta todo dia no horário escolhido. Se o Mac estiver dormindo no horário, coleta assim que acordar. O Mac avisa quando a coleta termina.
+- **Configurações:** carros acompanhados, sites, horário da coleta, chave da IA (com botão para testar) e botão para buscar atualização.
+- **Verificação de humano:** quando a Webmotors pede o "pressione e segure", o Mac mostra um aviso e o app traz a janela do Chrome para frente. Se ninguém responder em 2 minutos, a Webmotors fica de fora daquela coleta e as outras fontes seguem. O app não tenta resolver esse desafio sozinho: ele existe justamente para barrar acesso automático.
 
-```bash
-npm run chave
-```
+Para remover: `npm run desinstalar` (os dados em `~/.veiculomais` ficam guardados).
 
-O comando pede a chave e guarda em `~/.veiculomais/config.json`. O coletor, o servidor e a coleta agendada leem dali. A variável de ambiente `ANTHROPIC_API_KEY`, se existir, tem prioridade.
+### Onde ficam os dados
 
-### Comandos úteis
+| Arquivo | Conteúdo |
+| --- | --- |
+| `~/.veiculomais/veiculomais.db` | anúncios, histórico de preço e coletas |
+| `~/.veiculomais/buscas.json` | carros e sites escolhidos em Configurações |
+| `~/.veiculomais/config.json` | horário da coleta e chave da IA (só leitura do seu usuário) |
+| `~/.veiculomais/servidor.log` | log do serviço e das coletas |
+| `~/.veiculomais/chrome/` | perfil do Chrome usado na coleta |
+
+O serviço escuta só em `127.0.0.1`: nenhum outro computador da rede acessa o app. As ações que mudam algo (coletar, salvar, atualizar) só são aceitas vindas da própria página do app.
+
+### Comandos de terminal (opcionais)
 
 | Comando | O que faz |
 | --- | --- |
-| `npm run coletar` | roda todas as buscas, Chrome visível |
-| `npm run coletar:invisivel` | mesmo, sem janela |
-| `npm run coletar:rapido` | só Mobiauto, Na Pista e Chaves na Mão (sem navegador, uns 10 s) |
-| `node coletor/index.js --busca "Jetta GLI" --fontes olx,webmotors` | uma busca, fontes escolhidas |
+| `npm run instalar` | instala ou reinstala o app e o serviço |
+| `npm run coletar` | roda uma coleta pelo terminal, com o Chrome visível |
+| `npm run coletar:rapido` | só Mobiauto, Na Pista e Chaves na Mão (sem navegador) |
 | `npm run relatorio` | mostra o resultado da última coleta num bloco curto |
-| `npm run chave` | guarda a chave da Anthropic para o resumo por IA |
+| `npm run chave` | guarda a chave da Anthropic (o mesmo que a tela de Configurações) |
 | `node coletor/limpar.js olx` | apaga do banco os anúncios de uma fonte |
 | `npm run diagnostico` | resume as páginas salvas em debug para ajustar os conectores |
-| `npm run desagendar:mac` | remove o agendamento |
+| `npm run desinstalar` | remove o app e o serviço |
 
 ### Se OLX ou Webmotors falharem
 
-- **Verificação humana.** A Webmotors mostra um desafio do tipo "pressione e segure". Com a janela do Chrome visível, o coletor espera até 2 minutos para você resolver na própria janela e segue em frente. O coletor não tenta resolver esse desafio sozinho: ele existe justamente para impedir acesso automático. Para pedir menos vezes, a Webmotors lê só a primeira página de cada busca (`paginasPorFonte.webmotors` em `coletor/buscas.json`). Na coleta agendada, sem ninguém para responder, a Webmotors fica de fora daquele dia e as outras fontes seguem.
+- **Verificação humana.** Veja acima. Para pedir menos vezes, a Webmotors lê só a primeira página de cada busca.
 - **Nada reconhecido.** Os conectores desses dois sites foram escritos sem acesso direto a eles (bloqueiam servidores). Quando nada é reconhecido, o coletor salva o HTML e uma captura em `~/.veiculomais/debug/`. Rode `npm run diagnostico` e cole a saída na conversa: ela resume o que veio na página sem precisar enviar o arquivo inteiro.
 - As outras fontes continuam funcionando enquanto isso.
 
@@ -168,7 +169,11 @@ coletor/buscas.json        lista de buscas acompanhadas
 coletor/fontes/*.js        OLX e Webmotors via navegador
 coletor/avaliar.js         avaliação do dia e oportunidades
 coletor/resumo.js          resumo por IA (SDK da Anthropic) ou automático
-coletor/instalar-mac.sh    agendamento diário (launchd)
+app/instalar-mac.sh        instala o app (serviço launchd + Veículo Mais.app)
+src/coleta.js              coleta pelo app e agendamento diário
+src/buscas.js              buscas acompanhadas (~/.veiculomais/buscas.json)
+configuracoes.html, .js    tela de Configurações
+barra.js                   barra do app (Coletar agora, andamento, avisos)
 data/problemas-conhecidos.json
 index.html, app.js         busca ao vivo
 dia.html, dia.js           veículos de hoje
@@ -178,7 +183,7 @@ test/                      testes unitários (node --test)
 
 ## Próximos passos
 
-1. Ajustar os conectores de OLX e Webmotors com a primeira rodada no Mac.
+1. Versão para celular: publicar os dados de cada coleta num banco na nuvem para ver os veículos do dia no telefone.
 2. Alertas (e-mail ou WhatsApp) quando aparecer uma oportunidade.
 3. Gráfico de histórico de preço por anúncio e por modelo.
 4. Mais fontes: lojas e concessionárias, Mercado Livre com token.

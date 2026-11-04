@@ -1,0 +1,16 @@
+{
+  "name": "Veículo Mais",
+  "short_name": "Veículo Mais",
+  "description": "Todos os carros da internet em um só lugar, coletados todo dia.",
+  "start_url": "/dia.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f5fbf",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "images/icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "images/icone-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "images/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

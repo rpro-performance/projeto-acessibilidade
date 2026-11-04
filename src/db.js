@@ -8,8 +8,7 @@ const fs = require("fs");
 const DIR = process.env.VEICULOMAIS_DIR || path.join(os.homedir(), ".veiculomais");
 const ARQUIVO = path.join(DIR, "veiculomais.db");
 
-function hoje() {
-  const d = new Date();
+function hoje(d = new Date()) {
   const p = (n) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }

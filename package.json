@@ -9,11 +9,13 @@
     "coletar": "node coletor/index.js",
     "coletar:invisivel": "node coletor/index.js --invisivel",
     "coletar:rapido": "node coletor/index.js --sem-navegador",
-    "agendar:mac": "bash coletor/instalar-mac.sh",
-    "desagendar:mac": "bash coletor/desinstalar-mac.sh",
+    "agendar:mac": "bash app/instalar-mac.sh",
+    "desagendar:mac": "bash app/desinstalar-mac.sh",
     "diagnostico": "node coletor/diagnostico.js",
     "chave": "node coletor/chave.js",
-    "relatorio": "node --no-warnings coletor/relatorio.js"
+    "relatorio": "node --no-warnings coletor/relatorio.js",
+    "instalar": "bash app/instalar-mac.sh",
+    "desinstalar": "bash app/desinstalar-mac.sh"
   },
   "engines": {
     "node": ">=22.13"

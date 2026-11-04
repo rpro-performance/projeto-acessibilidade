@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a6fd6"/>
+      <stop offset="1" stop-color="#174a96"/>
+    </linearGradient>
+  </defs>
+  <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#fundo)"/>
+  <g transform="translate(152 300) scale(1.9)">
+    <path d="M10 140 L32 96 Q43 74 70 74 H226 Q248 74 264 90 L296 122 H322 a16 16 0 0 1 16 16 v8 a8 8 0 0 1 -8 8 H10 a8 8 0 0 1 -8 -8 v-6 a8 8 0 0 1 8 -8 Z" fill="#ffffff"/>
+    <path d="M52 96 Q58 84 72 84 H140 V120 H40 Z" fill="#9fc0f0"/>
+    <path d="M152 84 H222 Q236 84 246 94 L272 120 H152 Z" fill="#9fc0f0"/>
+    <circle cx="70" cy="152" r="26" fill="#1f1534"/>
+    <circle cx="70" cy="152" r="11" fill="#d9e2f2"/>
+    <circle cx="262" cy="152" r="26" fill="#1f1534"/>
+    <circle cx="262" cy="152" r="11" fill="#d9e2f2"/>
+  </g>
+  <g transform="translate(700 210)">
+    <circle r="92" fill="#f2a541"/>
+    <rect x="-14" y="-52" width="28" height="104" rx="8" fill="#ffffff"/>
+    <rect x="-52" y="-14" width="104" height="28" rx="8" fill="#ffffff"/>
+  </g>
+</svg>

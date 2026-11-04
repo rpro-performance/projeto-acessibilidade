@@ -27,7 +27,7 @@
       painel.append(
         el("div", { class: "aviso" },
           el("p", {}, el("strong", { text: "O coletor ainda não rodou neste computador." })),
-          el("p", { text: "Rode `npm run coletar` na pasta do projeto (ou agende com `npm run agendar:mac`). Depois recarregue esta página." })
+          el("p", { text: "Clique em \"Coletar agora\" na barra acima. A primeira coleta leva alguns minutos e abre uma janela do Chrome." })
         )
       );
       return;
@@ -93,5 +93,6 @@
 
   tipo.addEventListener("change", carregarLista);
   busca.addEventListener("change", carregarLista);
+  if (window.VMApp) window.VMApp.aoTerminarColeta(() => iniciar());
   iniciar();
 })();

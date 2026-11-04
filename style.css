@@ -54,7 +54,8 @@ body {
 
 .list {
   display: flex;
-  gap: 48px;
+  flex-wrap: wrap;
+  gap: 12px 40px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -480,4 +481,186 @@ select:focus {
   font-weight: normal;
   color: var(--muted);
   text-decoration: line-through;
+}
+
+.barra-app {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: -30px 0 32px;
+}
+
+.barra-app:empty {
+  display: none;
+}
+
+.barra-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.barra-status {
+  margin: 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ponto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2e9e5b;
+  flex-shrink: 0;
+}
+
+.barra-app.rodando .ponto {
+  background: var(--accent);
+  animation: pulsar 1.2s infinite ease-in-out;
+}
+
+@keyframes pulsar {
+  50% { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra-app.rodando .ponto { animation: none; }
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.button.secundario {
+  background: white;
+  color: var(--brand);
+  border: 1px solid var(--brand);
+}
+
+.button.secundario:hover,
+.button.secundario:focus {
+  background: #eef3fb;
+}
+
+.aviso-verificacao {
+  margin: 12px 0 0;
+  background: #fff6e8;
+  border-left: 4px solid var(--accent);
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.barra-erro {
+  margin: 12px 0 0;
+  color: #a12b2b;
+  font-size: 14px;
+}
+
+.log-coleta {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.log-coleta pre {
+  max-height: 240px;
+  overflow: auto;
+  background: #1f1534;
+  color: #e9e6f2;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: pre-wrap;
+}
+
+.config-bloco {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 24px 0;
+  background: white;
+}
+
+.config-bloco h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.busca-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin: 12px 0;
+  background: var(--surface);
+}
+
+.busca-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.busca-grid .field,
+.linha-form .field {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.link-remover {
+  background: none;
+  border: 0;
+  color: #a12b2b;
+  font: inherit;
+  font-size: 13px;
+  margin-top: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.config-fontes {
+  margin-top: 20px;
+}
+
+.acoes,
+.linha-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.field-largo {
+  flex: 1 1 260px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding-bottom: 10px;
+}
+
+.msg {
+  font-size: 14px;
+  color: #1e6b3a;
+}
+
+.msg.erro {
+  color: #a12b2b;
+}
+
+@media (max-width: 640px) {
+  .barra-app {
+    margin-top: -20px;
+  }
 }

@@ -6,7 +6,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Veículo Mais: os veículos de hoje, quedas de preço e oportunidades abaixo da FIPE, coletados automaticamente todo dia." />
+    <meta name="theme-color" content="#1f5fbf" />
     <title>Veículo Mais · Hoje</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="images/icone-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
   </head>
@@ -14,15 +17,17 @@
     <a class="skip-link" href="#hoje">Pular para os veículos de hoje</a>
     <div class="page">
       <header class="nav">
-        <a id="logo" href="index.html"><img src="images/logo.svg" alt="Veículo Mais" /></a>
+        <a id="logo" href="dia.html"><img src="images/logo.svg" alt="Veículo Mais" /></a>
         <nav aria-label="Principal">
           <ul class="list">
-            <li class="item"><a href="index.html">Home</a></li>
-            <li class="item"><a href="index.html#busca">Buscar</a></li>
             <li class="item"><a href="dia.html" aria-current="page">Hoje</a></li>
+            <li class="item"><a href="index.html#busca">Buscar</a></li>
+            <li class="item"><a href="configuracoes.html">Configurações</a></li>
           </ul>
         </nav>
       </header>
+
+      <div id="barra-app" class="barra-app"></div>
 
       <main id="hoje">
         <h1 class="title titulo-pagina">Veículos de <span>hoje</span></h1>
@@ -56,6 +61,7 @@
 
       <footer class="footer">Veículo Mais · todos os carros da internet em um só lugar</footer>
     </div>
+    <script src="barra.js"></script>
     <script src="cards.js"></script>
     <script src="dia.js"></script>
   </body>

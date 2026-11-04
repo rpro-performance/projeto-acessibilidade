@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1f5fbf" />
+    <title>Veículo Mais · Configurações</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="images/icone-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <div class="page">
+      <header class="nav">
+        <a id="logo" href="dia.html"><img src="images/logo.svg" alt="Veículo Mais" /></a>
+        <nav aria-label="Principal">
+          <ul class="list">
+            <li class="item"><a href="dia.html">Hoje</a></li>
+            <li class="item"><a href="index.html#busca">Buscar</a></li>
+            <li class="item"><a href="configuracoes.html" aria-current="page">Configurações</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <div id="barra-app" class="barra-app"></div>
+
+      <main id="conteudo">
+        <h1 class="title titulo-pagina">Configurações</h1>
+
+        <section class="config-bloco" aria-labelledby="t-buscas">
+          <h2 id="t-buscas">Carros que você acompanha</h2>
+          <p class="meta">Cada busca roda em todos os sites marcados abaixo, todo dia. Só o modelo é obrigatório.</p>
+          <form id="form-buscas" novalidate>
+            <div id="lista-buscas"></div>
+            <button type="button" class="button secundario" id="add-busca">+ Adicionar carro</button>
+
+            <fieldset class="field field-wide config-fontes">
+              <legend>Sites</legend>
+              <div class="sources" id="fontes"></div>
+              <p class="nota">A Webmotors pode pedir uma verificação de humano. Quando isso acontecer, o Mac avisa e você resolve na janela do Chrome.</p>
+            </fieldset>
+
+            <div class="acoes">
+              <button type="submit" class="button">Salvar buscas</button>
+              <span class="msg" id="msg-buscas" role="status" aria-live="polite"></span>
+            </div>
+          </form>
+        </section>
+
+        <section class="config-bloco" aria-labelledby="t-agenda">
+          <h2 id="t-agenda">Coleta automática</h2>
+          <form id="form-agenda" class="linha-form">
+            <label class="check"><input type="checkbox" id="agenda-ativo" /> Coletar todo dia</label>
+            <label class="field">Horário <input type="time" id="agenda-hora" required /></label>
+            <button type="submit" class="button">Salvar horário</button>
+            <span class="msg" id="msg-agenda" role="status" aria-live="polite"></span>
+          </form>
+          <p class="nota">O Mac precisa estar ligado. Se estiver dormindo no horário, a coleta roda assim que ele acordar.</p>
+        </section>
+
+        <section class="config-bloco" aria-labelledby="t-ia">
+          <h2 id="t-ia">Resumo do dia por IA</h2>
+          <p id="chave-status" class="meta">Carregando…</p>
+          <form id="form-chave" class="linha-form">
+            <label class="field field-largo">Chave da Anthropic
+              <input type="password" id="chave" autocomplete="off" placeholder="sk-ant-api03-..." />
+            </label>
+            <button type="submit" class="button">Salvar e testar</button>
+            <button type="button" class="button secundario" id="testar-chave">Testar chave atual</button>
+          </form>
+          <p class="msg" id="msg-chave" role="status" aria-live="polite"></p>
+          <p class="nota">Crie a chave em console.anthropic.com, no menu API Keys. Ela fica guardada só neste Mac e nunca aparece na tela.</p>
+        </section>
+
+        <section class="config-bloco" aria-labelledby="t-sobre">
+          <h2 id="t-sobre">Atualização</h2>
+          <p class="meta" id="versao">Versão: carregando…</p>
+          <div class="linha-form">
+            <button type="button" class="button secundario" id="atualizar">Buscar atualização</button>
+            <span class="msg" id="msg-atualizar" role="status" aria-live="polite"></span>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">Veículo Mais · todos os carros da internet em um só lugar</footer>
+    </div>
+    <script src="barra.js"></script>
+    <script src="configuracoes.js"></script>
+  </body>
+</html>

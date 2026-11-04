@@ -4,6 +4,7 @@
 const path = require("path");
 const fs = require("fs");
 const { DIR } = require("../src/db");
+const { notificar } = require("../src/notificar");
 
 const PERFIL = path.join(DIR, "chrome");
 const DEBUG = path.join(DIR, "debug");
@@ -60,6 +61,8 @@ async function pareceBloqueio(page) {
 async function aguardarHumano(page, segundos = 120) {
   const limite = Date.now() + segundos * 1000;
   console.log(`  >> O site pediu uma verificação. Resolva na janela do Chrome (até ${segundos} s)...`);
+  notificar("Veículo Mais", "Um site pediu verificação. Abra a janela do Chrome e segure o botão até completar.");
+  await page.bringToFront().catch(() => {});
   while (Date.now() < limite) {
     await pausa(3000, 3000);
     if (!(await pareceBloqueio(page))) {

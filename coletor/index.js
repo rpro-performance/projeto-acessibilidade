@@ -18,6 +18,9 @@ const { passaFiltros } = require("../src/search");
 const { porChave: fontesServidor } = require("../src/connectors");
 const { avaliar } = require("./avaliar");
 const { gerarResumo } = require("./resumo");
+const buscasConfig = require("../src/buscas");
+const trava = require("../src/trava");
+const { notificar } = require("../src/notificar");
 
 const fontesNavegador = {
   olx: require("./fontes/olx"),
@@ -35,7 +38,7 @@ function argumentos() {
     semNavegador: args.includes("--sem-navegador"),
     busca: pegar("--busca"),
     fontes: pegar("--fontes") ? pegar("--fontes").split(",").map((s) => s.trim()) : null,
-    config: pegar("--config") || path.join(__dirname, "buscas.json"),
+    config: pegar("--config"),
   };
 }
 
@@ -62,7 +65,11 @@ function tokens(s) {
 
 async function main() {
   const opts = argumentos();
-  const config = JSON.parse(fs.readFileSync(opts.config, "utf8"));
+  if (!trava.adquirir()) {
+    console.log("Já existe uma coleta em andamento. Espere ela terminar.");
+    process.exit(2);
+  }
+  const config = opts.config ? JSON.parse(fs.readFileSync(opts.config, "utf8")) : buscasConfig.ler();
   const data = db.hoje();
   const banco = db.abrir();
   const coletaId = db.iniciarColeta(banco, data);
@@ -70,7 +77,7 @@ async function main() {
 
   let buscas = config.buscas || [];
   if (opts.busca) buscas = buscas.filter((b) => (b.nome || b.modelo).toLowerCase() === opts.busca.toLowerCase());
-  if (!buscas.length) throw new Error("nenhuma busca para rodar; confira coletor/buscas.json");
+  if (!buscas.length) throw new Error("nenhuma busca para rodar; cadastre buscas em Configurações");
 
   let fontes = opts.fontes || config.fontes || [...Object.keys(fontesServidor), ...Object.keys(fontesNavegador)];
   if (opts.semNavegador) fontes = fontes.filter((f) => !fontesNavegador[f]);
@@ -87,6 +94,8 @@ async function main() {
   }
 
   const status = [];
+  // fonte que pediu verificação e ficou sem resposta não é tentada de novo nesta coleta
+  const puladas = new Map();
   const ritmo = config.ritmoMs || { min: 2500, max: 6000 };
   // paginasPorFonte pode ser um número ou um objeto por fonte: { "padrao": 2, "webmotors": 1 }
   const paginasDe = (chave) => {
@@ -111,6 +120,11 @@ async function main() {
         status.push({ busca: nome, fonte: chave, ok: false, erro: "navegador indisponível" });
         continue;
       }
+      if (puladas.has(chave)) {
+        status.push({ busca: nome, fonte: chave, ok: false, erro: puladas.get(chave) });
+        console.log(`  ${fonte.nome}: pulada (${puladas.get(chave)})`);
+        continue;
+      }
       try {
         const lista = fonte.navegador
           ? await fonte.buscar(contexto, f, { paginas: paginasDe(chave), ritmo, visivel: !opts.invisivel })
@@ -129,6 +143,7 @@ async function main() {
       } catch (e) {
         status.push({ busca: nome, fonte: chave, ok: false, erro: e.message, ms: Date.now() - t0 });
         console.log(`  ${fonte.nome}: FALHOU (${e.message})`);
+        if (/verificação humana/.test(e.message)) puladas.set(chave, "verificação não resolvida nesta coleta");
       }
     }
 
@@ -165,11 +180,14 @@ async function main() {
 
   console.log(`\n${resumo.texto}`);
   console.log(`\nColeta concluída em ${Math.round((Date.now() - inicio) / 1000)} s. Banco: ${db.ARQUIVO}`);
-  console.log(`Resumo ${resumo.porIA ? "escrito pelo Claude" : "automático (configure ANTHROPIC_API_KEY para o resumo por IA)"}.`);
+  const c = relatorio.contagens;
+  notificar("Veículo Mais", `Coleta concluída: ${c.novos} novos, ${c.quedas} caíram de preço, ${c.abaixoFipe} abaixo da FIPE.`);
+  console.log(`Resumo ${resumo.porIA ? "escrito pela IA" : "automático (para o resumo por IA, guarde uma chave em Configurações)"}.`);
   banco.close();
 }
 
 main().catch((e) => {
   console.error("Coleta falhou:", e.message);
+  notificar("Veículo Mais", `A coleta falhou: ${e.message}`);
   process.exit(1);
 });

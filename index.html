@@ -7,7 +7,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Veículo Mais: busque um carro uma vez e veja os anúncios de todos os sites do mercado em um só lugar." />
+    <meta name="theme-color" content="#1f5fbf" />
     <title>Veículo Mais</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="images/icone-192.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
 
@@ -23,13 +26,15 @@
         </a>
         <nav aria-label="Principal">
           <ul class="list">
-            <li class="item"><a href="#">Home</a></li>
-            <li class="item"><a href="#como-funciona">Como funciona</a></li>
-            <li class="item"><a href="#busca">Buscar</a></li>
             <li class="item"><a href="dia.html">Hoje</a></li>
+            <li class="item"><a href="#busca">Buscar</a></li>
+            <li class="item"><a href="#como-funciona">Como funciona</a></li>
+            <li class="item"><a href="configuracoes.html">Configurações</a></li>
           </ul>
         </nav>
       </header>
+
+      <div id="barra-app" class="barra-app"></div>
 
       <main>
         <section class="hero">
@@ -176,6 +181,7 @@
       </footer>
     </div>
 
+    <script src="barra.js"></script>
     <script src="cards.js"></script>
     <script src="app.js"></script>
   </body>
