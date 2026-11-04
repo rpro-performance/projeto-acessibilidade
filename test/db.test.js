@@ -30,18 +30,26 @@ test("coleta de dois dias: novos, queda de preço e sumidos", () => {
   assert.equal(r1.precoAnterior, 150000);
   const r3 = db.upsertAnuncio(banco, anuncio({ ...base, id: "3", url: "u3", preco: 170000 }), "Jetta", hoje);
   assert.equal(r3.novo, true);
-  assert.equal(db.marcarSumidos(banco, "x", "Jetta", hoje), 1);
+  // uma ausência não basta; só depois de 3 coletas seguidas sem o anúncio
+  assert.equal(db.marcarSumidos(banco, "x", "Jetta", hoje), 0);
+  assert.equal(db.marcarSumidos(banco, "x", "Jetta", hoje), 0, "mesmo dia não conta duas vezes");
+  db.upsertAnuncio(banco, anuncio({ ...base, id: "1", url: "u1", preco: 140000 }), "Jetta", "2026-10-27");
+  db.upsertAnuncio(banco, anuncio({ ...base, id: "3", url: "u3", preco: 170000 }), "Jetta", "2026-10-27");
+  assert.equal(db.marcarSumidos(banco, "x", "Jetta", "2026-10-27"), 0);
+  db.upsertAnuncio(banco, anuncio({ ...base, id: "1", url: "u1", preco: 140000 }), "Jetta", "2026-10-28");
+  db.upsertAnuncio(banco, anuncio({ ...base, id: "3", url: "u3", preco: 170000 }), "Jetta", "2026-10-28");
+  assert.equal(db.marcarSumidos(banco, "x", "Jetta", "2026-10-28"), 1);
 
   db.atualizarFipe(banco, "x:1", 155000, -10);
 
-  const c = db.contagens(banco, hoje);
-  assert.deepEqual(c, { ativos: 2, novos: 1, quedas: 1, abaixoFipe: 1, sumiram: 1 });
+  assert.deepEqual(db.contagens(banco, hoje), { ativos: 2, novos: 1, quedas: 1, abaixoFipe: 1, sumiram: 0 });
+  assert.deepEqual(db.contagens(banco, "2026-10-28"), { ativos: 2, novos: 0, quedas: 0, abaixoFipe: 1, sumiram: 1 });
 
   const quedas = db.listar(banco, { tipo: "quedas", data: hoje });
   assert.equal(quedas.length, 1);
   assert.equal(quedas[0].precoAnterior, 150000);
   assert.equal(quedas[0].fipe.diferencaPct, -10);
-  assert.equal(db.listar(banco, { tipo: "sumiram", data: hoje })[0].id, "2");
+  assert.equal(db.listar(banco, { tipo: "sumiram", data: "2026-10-28" })[0].id, "2");
   assert.deepEqual(db.historicoPreco(banco, "x:1").map((p) => p.preco), [150000, 140000]);
 
   // outra fonte com falha não marca nada como sumido
@@ -50,6 +58,7 @@ test("coleta de dois dias: novos, queda de preço e sumidos", () => {
   // relatório e resumo
   const id = db.iniciarColeta(banco, hoje);
   const rel = avaliar(banco, hoje);
+  rel.contagens.sumiram = 1; // simula um dia com sumido para o texto do resumo
   assert.equal(rel.oportunidades[0].id, "1");
   assert.ok(rel.oportunidades[0].motivos.some((m) => m.includes("abaixo da FIPE")));
   assert.equal(rel.porBusca[0].total, 2);
@@ -58,7 +67,7 @@ test("coleta de dois dias: novos, queda de preço e sumidos", () => {
   db.concluirColeta(banco, id, [{ fonte: "x", ok: true }], rel, texto);
   const ultima = db.ultimaColeta(banco);
   assert.equal(ultima.data, hoje);
-  assert.equal(ultima.relatorio.contagens.sumiram, 1);
+  assert.equal(ultima.relatorio.contagens.quedas, 1);
   const salvas = db.buscasSalvas(banco);
   assert.equal(salvas.length, 1);
   assert.equal(salvas[0].busca, "Jetta");

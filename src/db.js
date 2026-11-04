@@ -28,6 +28,12 @@ function abrir({ somenteLeitura = false } = {}) {
   return db;
 }
 
+const FALTAS_PARA_SUMIR = 3;
+
+function colunas(db, tabela) {
+  return db.prepare(`PRAGMA table_info(${tabela})`).all().map((c) => c.name);
+}
+
 function migrar(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS anuncios (
@@ -65,6 +71,7 @@ function migrar(db) {
     );
     CREATE INDEX IF NOT EXISTS idx_anuncios_busca ON anuncios(busca);
     CREATE INDEX IF NOT EXISTS idx_anuncios_primeira ON anuncios(primeira_vez);
+    CREATE TABLE IF NOT EXISTS meta (chave TEXT PRIMARY KEY, valor TEXT);
     CREATE TABLE IF NOT EXISTS precos (
       chave TEXT NOT NULL,
       data TEXT NOT NULL,
@@ -81,6 +88,14 @@ function migrar(db) {
       resumo TEXT
     );
   `);
+  const cols = colunas(db, "anuncios");
+  if (!cols.includes("faltas")) {
+    db.exec("ALTER TABLE anuncios ADD COLUMN faltas INTEGER NOT NULL DEFAULT 0");
+    db.exec("ALTER TABLE anuncios ADD COLUMN ultima_falta TEXT");
+    // Versões anteriores marcavam "sumiu" após uma única coleta sem o anúncio, o que dava falsos vendidos.
+    // Reativa esses anúncios e deixa a regra nova decidir.
+    db.exec("UPDATE anuncios SET ativo = 1, inativo_em = NULL, faltas = 1, ultima_falta = ultima_vez WHERE ativo = 0");
+  }
 }
 
 // Insere ou atualiza um anúncio normalizado. Devolve { novo, precoAnterior }.
@@ -105,7 +120,7 @@ function upsertAnuncio(db, a, busca, data) {
     UPDATE anuncios SET url = ?, titulo = ?, versao = COALESCE(?, versao), km = COALESCE(?, km), preco = COALESCE(?, preco),
       cambio = COALESCE(?, cambio), combustivel = COALESCE(?, combustivel), cor = COALESCE(?, cor), foto = COALESCE(?, foto),
       descricao = CASE WHEN ? != '' THEN ? ELSE descricao END, vendedor = COALESCE(?, vendedor), busca = ?,
-      ultima_vez = ?, ativo = 1, inativo_em = NULL,
+      ultima_vez = ?, ativo = 1, inativo_em = NULL, faltas = 0, ultima_falta = NULL,
       preco_anterior = CASE WHEN ? THEN preco ELSE preco_anterior END,
       preco_alterado_em = CASE WHEN ? THEN ? ELSE preco_alterado_em END
     WHERE chave = ?
@@ -120,12 +135,18 @@ function upsertAnuncio(db, a, busca, data) {
   return { novo: false, precoAnterior: mudouPreco ? existente.preco : null };
 }
 
-// Marca como inativos os anúncios de uma (fonte, busca) que não apareceram na coleta de hoje.
+// Conta uma falta (no máximo uma por dia) para os anúncios de uma (fonte, busca) que não apareceram
+// na coleta de hoje, e marca como inativos os que faltaram em FALTAS_PARA_SUMIR coletas seguidas.
+// Uma única ausência não basta: o site pode ter mudado a ordem ou a página lida.
 function marcarSumidos(db, fonte, busca, data) {
+  db.prepare(`
+    UPDATE anuncios SET faltas = faltas + 1, ultima_falta = ?
+    WHERE fonte = ? AND busca = ? AND ativo = 1 AND ultima_vez < ? AND (ultima_falta IS NULL OR ultima_falta < ?)
+  `).run(data, fonte, busca, data, data);
   return db.prepare(`
     UPDATE anuncios SET ativo = 0, inativo_em = ?
-    WHERE fonte = ? AND busca = ? AND ativo = 1 AND ultima_vez < ?
-  `).run(data, fonte, busca, data).changes;
+    WHERE fonte = ? AND busca = ? AND ativo = 1 AND faltas >= ?
+  `).run(data, fonte, busca, FALTAS_PARA_SUMIR).changes;
 }
 
 function atualizarFipe(db, chave, fipe, pct) {
@@ -231,6 +252,6 @@ function historicoPreco(db, chave) {
 }
 
 module.exports = {
-  DIR, ARQUIVO, hoje, abrir, upsertAnuncio, marcarSumidos, atualizarFipe, iniciarColeta, concluirColeta,
+  FALTAS_PARA_SUMIR, DIR, ARQUIVO, hoje, abrir, upsertAnuncio, marcarSumidos, atualizarFipe, iniciarColeta, concluirColeta,
   ultimaColeta, listar, contagens, buscasSalvas, historicoPreco, linhaParaAnuncio,
 };

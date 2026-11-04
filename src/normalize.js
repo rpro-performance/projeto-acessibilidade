@@ -69,6 +69,24 @@ function limparTexto(v) {
   return /^\$[A-Za-z0-9:]*$/.test(s) ? "" : s;
 }
 
+const UFS = {
+  acre: "AC", alagoas: "AL", amapa: "AP", amazonas: "AM", bahia: "BA", ceara: "CE", "distrito federal": "DF",
+  "espirito santo": "ES", goias: "GO", maranhao: "MA", "mato grosso": "MT", "mato grosso do sul": "MS",
+  "minas gerais": "MG", para: "PA", paraiba: "PB", parana: "PR", pernambuco: "PE", piaui: "PI",
+  "rio de janeiro": "RJ", "rio grande do norte": "RN", "rio grande do sul": "RS", rondonia: "RO", roraima: "RR",
+  "santa catarina": "SC", "sao paulo": "SP", sergipe: "SE", tocantins: "TO",
+};
+const SIGLAS = new Set(Object.values(UFS));
+
+// Aceita "SP", "sp", "São Paulo" ou "BR-SP" e devolve a sigla, ou null.
+function normalizarUf(v) {
+  if (!v) return null;
+  const s = String(v).trim().replace(/^BR-/i, "");
+  if (SIGLAS.has(s.toUpperCase())) return s.toUpperCase();
+  const nome = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  return UFS[nome] || null;
+}
+
 function anuncio(parcial) {
   const marca = capitalizar(parcial.marca);
   const modelo = capitalizar(parcial.modelo);
@@ -90,7 +108,7 @@ function anuncio(parcial) {
     combustivel: normalizarCombustivel(parcial.combustivel),
     cor: parcial.cor ? capitalizar(parcial.cor) : null,
     cidade: parcial.cidade ? capitalizar(parcial.cidade) : null,
-    estado: parcial.estado ? String(parcial.estado).toUpperCase().slice(0, 2) : null,
+    estado: normalizarUf(parcial.estado),
     foto: parcial.foto || null,
     descricao: limparTexto(parcial.descricao),
     vendedor: parcial.vendedor || null,
@@ -98,4 +116,4 @@ function anuncio(parcial) {
   };
 }
 
-module.exports = { anuncio, numero, capitalizar, normalizarCambio, normalizarCombustivel, inferirCambio };
+module.exports = { anuncio, numero, capitalizar, normalizarCambio, normalizarCombustivel, inferirCambio, normalizarUf, SIGLAS };

@@ -3,7 +3,7 @@
 // Escrito sem acesso direto ao site (ele bloqueia servidores); se nada for extraído, salva HTML e
 // captura de tela em ~/.veiculomais/debug para ajuste.
 
-const { anuncio } = require("../../src/normalize");
+const { anuncio, SIGLAS } = require("../../src/normalize");
 const { pausa, rolar, pareceBloqueio, aguardarHumano, salvarDebug } = require("../navegador");
 
 const BASE = "https://www.olx.com.br";
@@ -99,6 +99,8 @@ async function extrairJsonLd(page, q) {
             preco: offer.price ?? offer.lowPrice ?? (Array.isArray(offer) ? offer[0]?.price : null),
             foto: Array.isArray(item.image) ? item.image[0] : item.image,
             descricao: item.description,
+            cidade: localDoLink(item.url).regiao,
+            estado: localDoLink(item.url).estado,
           })
         );
       }
@@ -107,6 +109,33 @@ async function extrairJsonLd(page, q) {
     }
   }
   return itens;
+}
+
+// O link da OLX traz o estado no subdomínio e a região no caminho:
+// https://sp.olx.com.br/sao-paulo-e-regiao/autos-e-pecas/...  ->  { estado: "SP", regiao: "São Paulo e região" }
+function localDoLink(url) {
+  const m = String(url || "").match(/^https?:\/\/([a-z]{2})\.olx\.com\.br\/([^/]+)\//i);
+  if (!m) return { estado: null, regiao: null };
+  const uf = m[1].toUpperCase();
+  const slugRegiao = m[2];
+  const regiao = /autos-e-pecas/.test(slugRegiao)
+    ? null
+    : slugRegiao
+        .replace(/-e-regiao$/, "")
+        .replace(/^(regiao|grande)-(de-|do-|da-)?/, "")
+        .split("-")
+        .map((p) => (/^(de|do|da|dos|das|e)$/.test(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)))
+        .join(" ");
+  return { estado: SIGLAS.has(uf) ? uf : null, regiao };
+}
+
+// Procura no texto do card uma linha de localização ("Cidade, Bairro - UF" ou "Cidade - UF").
+function localDoTexto(linhas) {
+  for (const l of linhas) {
+    const m = l.match(/^([^\d|•·]{3,60}?)\s*[-–]\s*([A-Z]{2})$/);
+    if (m && SIGLAS.has(m[2])) return { cidade: m[1].split(",")[0].trim(), estado: m[2] };
+  }
+  return { cidade: null, estado: null };
 }
 
 // Separa marca/modelo/versão a partir do título do anúncio ("Volkswagen Jetta Gli 2023").
@@ -155,10 +184,10 @@ async function extrairDom(page, q) {
     const preco = (c.texto.match(/R\$\s?([\d.]{4,})/) || [])[1];
     const km = (c.texto.match(/([\d.]+)\s*km\b/i) || [])[1];
     const ano = (c.texto.match(/\b((?:19|20)\d{2})\b/) || [])[1];
-    const local = linhas.find((l) => /^[^\d|]{3,}(,\s*[^\d|]+)?\s*-\s*[A-Z]{2}$/.test(l)) || "";
-    const partes = local.split(/\s*-\s*/);
-    const uf = partes.length > 1 ? partes[partes.length - 1] : null;
-    const cidade = partes.length > 1 ? partes[0].split(",")[0] : null;
+    const doTexto = localDoTexto(linhas);
+    const doLink = localDoLink(c.href);
+    const cidade = doTexto.cidade || doLink.regiao;
+    const uf = doTexto.estado || doLink.estado;
     const t = dividirTitulo(c.titulo, q);
     return anuncio({
       id: c.id,
@@ -208,7 +237,10 @@ async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000
         for (const a of await extrairDom(page, q)) {
           const base = porId.get(a.id);
           if (!base) porId.set(a.id, a);
-          else for (const k of Object.keys(a)) if ((base[k] == null || base[k] === "") && a[k] != null && a[k] !== "") base[k] = a[k];
+          else {
+            for (const k of Object.keys(a)) if ((base[k] == null || base[k] === "") && a[k] != null && a[k] !== "") base[k] = a[k];
+            if (a.cidade) base.cidade = a.cidade;
+          }
         }
         lista = [...porId.values()];
       }
@@ -226,4 +258,4 @@ async function buscar(contexto, q, { paginas = 2, ritmo = { min: 2500, max: 6000
   return resultados;
 }
 
-module.exports = { chave: "olx", nome: "OLX", navegador: true, buscar };
+module.exports = { chave: "olx", nome: "OLX", navegador: true, buscar, localDoLink, localDoTexto, dividirTitulo };

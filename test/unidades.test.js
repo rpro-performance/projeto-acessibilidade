@@ -78,3 +78,22 @@ test("lerObjetoJson e slug", () => {
   assert.deepEqual(lerObjetoJson(t, t.indexOf("{")), { id: 1, a: { b: "}" }, c: [1, 2] });
   assert.equal(slug("Chaves na Mão / Jetta GLI"), "chaves-na-mao-jetta-gli");
 });
+
+test("normalizarUf aceita sigla, nome e BR-XX", () => {
+  const { normalizarUf } = require("../src/normalize");
+  assert.equal(normalizarUf("SP"), "SP");
+  assert.equal(normalizarUf("São Paulo"), "SP");
+  assert.equal(normalizarUf("Rio Grande do Sul"), "RS");
+  assert.equal(normalizarUf("BR-MG"), "MG");
+  assert.equal(normalizarUf("Xx"), null);
+});
+
+test("OLX: local pelo link e pelo texto do card", () => {
+  const { localDoLink, localDoTexto } = require("../coletor/fontes/olx");
+  assert.deepEqual(localDoLink("https://sp.olx.com.br/sao-paulo-e-regiao/autos-e-pecas/carros-vans-e-utilitarios/x-1548629683"), { estado: "SP", regiao: "Sao Paulo" });
+  assert.deepEqual(localDoLink("https://mg.olx.com.br/belo-horizonte-e-regiao/autos-e-pecas/x-1548629683"), { estado: "MG", regiao: "Belo Horizonte" });
+  assert.equal(localDoLink("https://pr.olx.com.br/autos-e-pecas/carros/x-1548629683").regiao, null);
+  assert.deepEqual(localDoTexto(["R$ 99.900", "São Paulo, Mooca - SP"]), { cidade: "São Paulo", estado: "SP" });
+  assert.deepEqual(localDoTexto(["Belo Horizonte - MG"]), { cidade: "Belo Horizonte", estado: "MG" });
+  assert.deepEqual(localDoTexto(["2023 | 40.000 km"]), { cidade: null, estado: null });
+});

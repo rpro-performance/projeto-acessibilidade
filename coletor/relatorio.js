@@ -2,6 +2,7 @@
 // Mostra o resultado da última coleta num bloco curto, para conferir ou colar numa conversa.
 //   npm run relatorio
 const db = require("../src/db");
+const config = require("../src/config");
 
 const banco = db.abrir({ somenteLeitura: true });
 if (!banco) {
@@ -42,5 +43,12 @@ for (const f of fontes) {
   }
 }
 
+const chave = process.env.ANTHROPIC_API_KEY || config.ler().anthropicApiKey || "";
+const tipoChave = !chave
+  ? "nenhuma chave guardada (rode: npm run chave)"
+  : chave.startsWith("sk-ant-api")
+    ? `chave de API guardada (${chave.slice(0, 13)}..., ${chave.length} caracteres)`
+    : `chave guardada, mas não é de API (${chave.slice(0, 11)}...). Gere uma em console.anthropic.com > API Keys`;
+console.log(`\nChave da IA: ${tipoChave}`);
 console.log(`\nResumo do dia:\n${ultima.resumo || "(sem resumo)"}`);
 banco.close();
